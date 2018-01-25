@@ -12,6 +12,12 @@ inline void random_uint32() {
     uint32_t trash = 0;
     wtl::benchmark([&](){
         for (size_t i=0; i<n; ++i) {
+            trash += static_cast<uint32_t>(wtl::sfmt64()());
+        }
+    }, "static_cast32(gen64)");
+    std::cerr << trash << std::endl;
+    wtl::benchmark([&](){
+        for (size_t i=0; i<n; ++i) {
             trash += wtl::sfmt()();
         }
     }, "gen32::operator()");
