@@ -1,0 +1,105 @@
+---
+title: "Phylogenetic Tree"
+author: "WMI"
+date: "February 14, 2017"
+output:
+  html_document:
+    css: "~/.R/rmd.css"
+    self_contained: true
+    theme: null
+    highlight: null
+    mathjax: https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/MathJax.js?config=TeX-AMS_CHTML
+---
+
+## Make distance matrix from aligned sequences
+
+[BioC Biostrings](https://bioconductor.org/packages/release/bioc/html/Biostrings.html)
+
+```{r dist, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(Biostrings)
+.text = '
+>a
+AAAAAAAA
+>b
+AAAAAACC
+>c
+AAAAGGCC
+>d
+CCTTAAAA
+'
+.file = tempfile(fileext='fa')
+cat(.text, file=.file)
+.seqs = Biostrings::readDNAStringSet(.file)
+.dist = Biostrings::stringDist(.seqs, method='hamming') %>% print()
+```
+
+## Make trees from distance matrix
+
+[ape](http://ape-package.ird.fr/)
+
+```{r phylo, message=FALSE, warning=FALSE}
+library(ape)
+#.phylo = ape::nj(.dist)
+.phylo = ape::fastme.ols(.dist)
+plot.phylo(.phylo, type='unrooted')
+```
+
+## Manipulation and visualization of trees
+
+### igraph and tidygraph
+
+- [igraph](http://igraph.org/r/doc/)
+- [tidygraph](https://github.com/thomasp85/tidygraph)
+- [ggraph](https://github.com/thomasp85/ggraph)
+
+基準となるのは `igraph` クラス。
+ただし `V()` や `E()` を介して操作するのが少しツラいので、
+2つのtibble (`nodes`, `edges`) をまとめた `tbl_graph` クラスを介して操作する。
+つまり、igraphをtidyverseっぽい統一的なインターフェイスで操作できるようになる。
+
+文字通りgraphが主眼なので、
+距離情報を重視しないレイアウトが多く、
+系統樹を描くには使いにくい。
+
+```{r thomasp85, message=FALSE, warning=FALSE}
+library(tidygraph)
+library(ggraph)
+library(igraph)
+
+.tg = tidygraph::as_tbl_graph(.phylo) %>%
+  tidygraph::activate('edges') %>%
+  tidygraph::mutate(weight = 1.0 / (.phylo$edge.length + 1e-3)) %>%
+  print()
+
+ggraph(.tg, layout='igraph', algorithm='fr')+
+geom_edge_link()+
+geom_node_point(size=8, colour='dodgerblue')+
+geom_node_text(aes(label = name))+
+theme_bw()
+```
+
+### tidytree
+
+- [tidytree](https://github.com/GuangchuangYu/tidytree)
+- [ggtree](https://github.com/GuangchuangYu/ggtree)
+- [treeio](https://bioconductor.org/packages/treeio/)
+
+基準となるのは `phylo` クラス。
+一旦 `tbl_tree` に変換してtidyverseらしく操作して、
+`phylo` に戻して `ggtree()` で描画する。
+
+もうひとつの `treedata` クラスはtreeioパッケージで外部ファイルを読むときに使われる形式。
+
+```{r GuangchuangYu, message=FALSE, warning=FALSE}
+library(tidytree)
+.tbl_tree = tidytree::as_data_frame(.phylo) %>% print()
+.treedata = tidytree::as.treedata(.tbl_tree) %>% print()
+library(ggtree)
+ggtree(.phylo)+
+geom_tiplab()
+
+ggtree(.phylo, layout='unrooted')+
+geom_tiplab()
+```
+
