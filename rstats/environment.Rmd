@@ -1,0 +1,101 @@
+---
+title: "Environment"
+output:
+  html_document:
+    css: "~/.R/rmd.css"
+    self_contained: true
+    theme: null
+    highlight: null
+    mathjax: https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/MathJax.js?config=TeX-AMS_CHTML
+---
+
+```{r option, include=FALSE}
+knitr::opts_chunk$set(results="hold")
+```
+
+定義済み環境
+
+```{r predefined}
+emptyenv()
+baseenv()
+globalenv()
+environmentName(globalenv())
+```
+
+検索範囲を内側(子)から外側(親)に広げていくイメージとすると、
+Rコンソールの一番内側の `R_GlobalEnv` が最初に検索されて、
+その外に `library()` したパッケージの名前空間が続いて、
+一番外の `base`, `R_EmptyEnv` が検索される。
+
+```{r search}
+environment()
+# attach(iris)
+search()
+parent.env(globalenv())
+parent.env(baseenv())
+
+path_from_here = function(envir) {
+  .envs = c()
+  while (!identical(envir, emptyenv())) {
+    .envs = c(.envs, environmentName(envir))
+    envir = parent.env(envir)
+  }
+  .envs
+}
+path_from_here(environment())
+```
+
+パッケージからexportされてるオブジェクトは、
+`R_GlobalEnv` から探すと見つかるが、
+`base` から探すと見つからない。
+
+```{r head}
+exists("head", env=globalenv())
+exists("head", env=baseenv())
+exists("head", where="package:utils")
+environment(head)
+find("head")
+```
+
+`parent.env()` が定義時の構文における親を返すのに対して、
+`parent.frame()` は実行時のコールスタックにおける親を返す。
+
+```{r parent_env_frame}
+environment()
+parent.frame()
+print_env = function() {
+  here = environment()
+  attr(here, "name") = "print_env_env"
+  cat("environment()  ", environmentName(here), "\n")
+  cat("parent.frame() ", environmentName(parent.frame()), "\n")
+  path_from_here(here)
+}
+print_env()
+```
+
+名前空間として使うもよし、高速なハッシュとして使うもよし。
+子環境から親環境の変数は見えるが、ダラーで直接アクセスすることはできない。
+`get(name, envir)` は存在しないときエラーで止まり、
+`get0()` は止まらずに `NULL` を返す。
+
+```{r usage}
+parent_env = new.env()
+child_env = new.env(parent = parent_env)
+
+assign("answer", 42L, envir=parent_env)
+ls(parent_env)
+parent_env$answer
+
+assign("whoami", 24601L, envir=child_env)
+ls(child_env)
+child_env$whoami
+
+exists("whoami", envir=parent_env)
+exists("answer", envir=child_env)
+child_env$answer
+get("answer", envir=child_env)
+# get("noexists", envir=child_env)  ERROR!
+get0("noexists", envir=child_env)
+```
+
+TODO: わざわざパッケージを作らずに名前空間だけを作る方法？
