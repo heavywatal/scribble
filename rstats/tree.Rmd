@@ -99,6 +99,11 @@ library(ggtree)
 ggtree(.phylo)+
 geom_tiplab()
 
+rtree(8) %>% as_data_frame()
+refresh('ggtree', '~/tmp/git')
+.t = rtree(40)
+ggtree(.t, layout='daylight')+geom_tiplab()
+
 ggtree(.phylo, layout='unrooted')+
 geom_tiplab()
 ```

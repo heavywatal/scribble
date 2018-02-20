@@ -23,6 +23,7 @@ dev.off()
 quartz(width = 4, height = 4)
 plot_logo()
 
+ggsave("heavywatal.png", plot_logo(), height = 4, width = 4, dpi = 300)
 ggsave("heavywatal.png", plot_logo(), height = 4, width = 4, dpi = 300, bg = "transparent")
 ggsave("heavywatal.svg", plot_logo(0.75), height = 4, width = 4, bg = "transparent")
 # svglite bug?
