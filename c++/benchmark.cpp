@@ -31,6 +31,35 @@ inline void random_uint32() {
     std::cerr << trash << std::endl;
 }
 
+inline void random_canonical() {
+    constexpr size_t n = 8 * 1000 * 1000;
+    double trash = 0;
+    wtl::benchmark([&](){
+        for (size_t i=0; i<n; ++i) {
+            trash += wtl::generate_canonical(wtl::sfmt64());
+        }
+    }, "wtl::generate_cannonical(gen64)");
+    std::cerr << trash << std::endl;
+    wtl::benchmark([&](){
+        for (size_t i=0; i<n; ++i) {
+            trash += wtl::generate_canonical(wtl::sfmt());
+        }
+    }, "wtl::generate_cannonical(gen32)");
+    std::cerr << trash << std::endl;
+    wtl::benchmark([&](){
+        for (size_t i=0; i<n; ++i) {
+            trash += std::generate_canonical<double, std::numeric_limits<double>::digits>(wtl::sfmt64());
+        }
+    }, "std::generate_cannonical<>(gen64)");
+    std::cerr << trash << std::endl;
+    wtl::benchmark([&](){
+        for (size_t i=0; i<n; ++i) {
+            trash += std::generate_canonical<double, std::numeric_limits<double>::digits>(wtl::sfmt());
+        }
+    }, "std::generate_cannonical<>(gen32)");
+    std::cerr << trash << std::endl;
+}
+
 inline void random_sample() {
     constexpr size_t n = 4 * 1000 * 1000;
     std::vector<size_t> x(n);
@@ -85,6 +114,7 @@ inline void random_engine() {
 
 int main() {
     random_uint32();
+    random_canonical();
     random_sample();
     random_engine();
 }
