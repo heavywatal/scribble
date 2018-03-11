@@ -13,7 +13,7 @@ output:
 # library(tidyverse)
 ```
 
-Code is printe and evaluated.
+Code is printed and evaluated.
 ```{r all_true}
 print('all TRUE')
 ```
