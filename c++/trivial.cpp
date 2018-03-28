@@ -68,52 +68,52 @@ class NonTrivMember {
 };
 
 // scalars and pointers are trivial; reference and containers are not
-static_assert( std::is_trivial<int>::value, "");
-static_assert( std::is_trivial<int*>::value, "");
-static_assert(!std::is_trivial<int&>::value, "");
-static_assert(!std::is_trivial<std::vector<int>>::value, "");
+static_assert( std::is_trivial<int>{}, "");
+static_assert( std::is_trivial<int*>{}, "");
+static_assert(!std::is_trivial<int&>{}, "");
+static_assert(!std::is_trivial<std::vector<int>>{}, "");
 
 // has no non-traivial member && has trivial default ctor/dtor
-static_assert( std::is_trivially_default_constructible<Empty>::value, "");
-static_assert( std::is_trivially_default_constructible<DefaultCtorDefault>::value, "");
-static_assert( std::is_trivially_default_constructible<DefaultCtorDefaultPlus>::value, "");
-static_assert(!std::is_trivially_default_constructible<DefaultCtor>::value, "");
-static_assert( std::is_trivially_default_constructible<CopyCtorDefault>::value, "");
-static_assert( std::is_trivially_default_constructible<CopyCtor>::value, "");
-static_assert( std::is_trivially_default_constructible<MoveCtorDefault>::value, "");
-static_assert( std::is_trivially_default_constructible<MoveCtor>::value, "");
-static_assert( std::is_trivially_default_constructible<DtorDefault>::value, "");
-static_assert(!std::is_trivially_default_constructible<Dtor>::value, "");
-static_assert(!std::is_trivially_default_constructible<MemberInit>::value, "");
-static_assert(!std::is_trivially_default_constructible<NonTrivMember>::value, "");
+static_assert( std::is_trivially_default_constructible<Empty>{}, "");
+static_assert( std::is_trivially_default_constructible<DefaultCtorDefault>{}, "");
+static_assert( std::is_trivially_default_constructible<DefaultCtorDefaultPlus>{}, "");
+static_assert(!std::is_trivially_default_constructible<DefaultCtor>{}, "");
+static_assert( std::is_trivially_default_constructible<CopyCtorDefault>{}, "");
+static_assert( std::is_trivially_default_constructible<CopyCtor>{}, "");
+static_assert( std::is_trivially_default_constructible<MoveCtorDefault>{}, "");
+static_assert( std::is_trivially_default_constructible<MoveCtor>{}, "");
+static_assert( std::is_trivially_default_constructible<DtorDefault>{}, "");
+static_assert(!std::is_trivially_default_constructible<Dtor>{}, "");
+static_assert(!std::is_trivially_default_constructible<MemberInit>{}, "");
+static_assert(!std::is_trivially_default_constructible<NonTrivMember>{}, "");
 
 // std::memcpy()-able: trivial copy, move, dtor
-static_assert( std::is_trivially_copyable<Empty>::value, "");
-static_assert( std::is_trivially_copyable<DefaultCtorDefault>::value, "");
-static_assert( std::is_trivially_copyable<DefaultCtorDefaultPlus>::value, "");
-static_assert( std::is_trivially_copyable<DefaultCtor>::value, "");
-static_assert( std::is_trivially_copyable<CopyCtorDefault>::value, "");
-static_assert(!std::is_trivially_copyable<CopyCtor>::value, "");
-static_assert( std::is_trivially_copyable<MoveCtorDefault>::value, "");
-static_assert(!std::is_trivially_copyable<MoveCtor>::value, "");
-static_assert( std::is_trivially_copyable<DtorDefault>::value, "");
-static_assert(!std::is_trivially_copyable<Dtor>::value, "");
-static_assert( std::is_trivially_copyable<MemberInit>::value, "");
-static_assert(!std::is_trivially_copyable<NonTrivMember>::value, "");
+static_assert( std::is_trivially_copyable<Empty>{}, "");
+static_assert( std::is_trivially_copyable<DefaultCtorDefault>{}, "");
+static_assert( std::is_trivially_copyable<DefaultCtorDefaultPlus>{}, "");
+static_assert( std::is_trivially_copyable<DefaultCtor>{}, "");
+static_assert( std::is_trivially_copyable<CopyCtorDefault>{}, "");
+static_assert(!std::is_trivially_copyable<CopyCtor>{}, "");
+static_assert( std::is_trivially_copyable<MoveCtorDefault>{}, "");
+static_assert(!std::is_trivially_copyable<MoveCtor>{}, "");
+static_assert( std::is_trivially_copyable<DtorDefault>{}, "");
+static_assert(!std::is_trivially_copyable<Dtor>{}, "");
+static_assert( std::is_trivially_copyable<MemberInit>{}, "");
+static_assert(!std::is_trivially_copyable<NonTrivMember>{}, "");
 
 // is_trivially_default_constructible && is_trivially_copyable
-static_assert( std::is_trivial<Empty>::value, "");
-static_assert( std::is_trivial<DefaultCtorDefault>::value, "");
-static_assert( std::is_trivial<DefaultCtorDefaultPlus>::value, "");
-static_assert(!std::is_trivial<DefaultCtor>::value, "");
-static_assert( std::is_trivial<CopyCtorDefault>::value, "");
-static_assert(!std::is_trivial<CopyCtor>::value, "");
-static_assert( std::is_trivial<MoveCtorDefault>::value, "");
-static_assert(!std::is_trivial<MoveCtor>::value, "");
-static_assert( std::is_trivial<DtorDefault>::value, "");
-static_assert(!std::is_trivial<Dtor>::value, "");
-static_assert(!std::is_trivial<MemberInit>::value, "");
-static_assert(!std::is_trivial<NonTrivMember>::value, "");
+static_assert( std::is_trivial<Empty>{}, "");
+static_assert( std::is_trivial<DefaultCtorDefault>{}, "");
+static_assert( std::is_trivial<DefaultCtorDefaultPlus>{}, "");
+static_assert(!std::is_trivial<DefaultCtor>{}, "");
+static_assert( std::is_trivial<CopyCtorDefault>{}, "");
+static_assert(!std::is_trivial<CopyCtor>{}, "");
+static_assert( std::is_trivial<MoveCtorDefault>{}, "");
+static_assert(!std::is_trivial<MoveCtor>{}, "");
+static_assert( std::is_trivial<DtorDefault>{}, "");
+static_assert(!std::is_trivial<Dtor>{}, "");
+static_assert(!std::is_trivial<MemberInit>{}, "");
+static_assert(!std::is_trivial<NonTrivMember>{}, "");
 
 int main() {
     return 0;
