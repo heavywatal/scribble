@@ -4,17 +4,27 @@
 class Vector {
   public:
     Vector() = delete;
-    Vector(size_t n, int x): vec_(n, x) {
+    Vector(size_t n, int x) noexcept: vec_(n, x) {
         std::cout << "constructor\n";
     }
-    ~Vector() {
+    ~Vector() noexcept {
         std::cout << "destructor\n";
     }
-    Vector(const Vector& o): vec_(o.vec_) {
+    Vector(const Vector& o) noexcept: vec_(o.vec_) {
         std::cout << "copy!\n";
     }
-    Vector(Vector&& o): vec_(std::move(o.vec_)) {
+    Vector& operator=(const Vector& o) noexcept {
+        std::cout << "copy assign\n";
+        vec_ = o.vec_;
+        return *this;
+    }
+    Vector(Vector&& o) noexcept: vec_(std::move(o.vec_)) {
         std::cout << "move\n";
+    }
+    Vector& operator=(Vector&& o) noexcept {
+        std::cout << "move assign\n";
+        vec_ = std::move(o.vec_);
+        return *this;
     }
     void times (int x) {
         for (auto& y: vec_) {y *= x;}
