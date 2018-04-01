@@ -101,9 +101,29 @@ void overload() {
     std::cout << "\n";
 }
 
+template <class T>
+auto universal_ref(T&& vec) {
+    // T is Vector& for lvalue
+    // T is Vector  for rvalue
+    return overload(std::forward<T>(vec));
+}
+
+void universal_ref() {
+    std::cout << "###### universal_ref\n";
+    auto vec0 = factory(3);
+    std::cout << "l\n";
+    auto vec1 = universal_ref(vec0);             //  lvalue 1 copy
+    std::cout << "x\n";
+    auto vec2 = universal_ref(std::move(vec0));  //  xvalue        1 move
+    std::cout << "pr\n";
+    auto vec3 = universal_ref(factory(3));       // prvalue        1 move
+    std::cout << "\n";
+}
+
 int main() {
     pass_by_const_ref();
     pass_by_value();
     overload();
+    universal_ref();
     return 0;
 }
