@@ -47,6 +47,29 @@ plot.phylo(.phylo, type='unrooted')
 
 ## Manipulation and visualization of trees
 
+### network, sna, ggnet
+
+- [network](https://cran.r-project.org/web/packages/network/)
+- [sna](https://cran.r-project.org/web/packages/sna/)
+- [ggnet](https://github.com/briatte/ggnet)
+- [ggnetwork](https://github.com/briatte/ggnetwork)
+- [geomnet](https://github.com/sctyner/geomnet)
+
+`network` クラスを中心に、
+`sna` がレイアウトを計算して、
+`ggnet` がggplotシステムで描画する。
+
+同じ作者からいくつもパッケージが出ていて関係性が見えにくい。
+[GGally](https://github.com/ggobi/ggally)
+に含まれるggnet2を使うのがよさそう？
+
+```{r network}
+library(network)
+library(sna)
+library(GGally)
+```
+
+
 ### igraph and tidygraph
 
 - [igraph](http://igraph.org/r/doc/)
@@ -66,6 +89,8 @@ plot.phylo(.phylo, type='unrooted')
 library(tidygraph)
 library(ggraph)
 library(igraph)
+
+# igraph::igraph_options(return.vs.es=FALSE)
 
 .tg = tidygraph::as_tbl_graph(.phylo) %>%
   tidygraph::activate('edges') %>%
@@ -91,20 +116,25 @@ theme_bw()
 
 もうひとつの `treedata` クラスはtreeioパッケージで外部ファイルを読むときに使われる形式。
 
+igraph の `all_simple_paths()`, `all_shortest_paths()`, `shortest_paths()`
+は単純な二分木ならどれ使っても同じだろうと思いきや、
+all_系は出力の順番が入力と同じにならないので要注意。
+
+
 ```{r GuangchuangYu, message=FALSE, warning=FALSE}
 library(tidytree)
 .tbl_tree = tidytree::as_data_frame(.phylo) %>% print()
 .treedata = tidytree::as.treedata(.tbl_tree) %>% print()
-library(ggtree)
+# library(ggtree)
+wtl::refresh('ggtree')
+ggtree(.tree, layout='daylight')+geom_tiplab()
+
 ggtree(.phylo)+
 geom_tiplab()
 
-rtree(8) %>% as_data_frame()
-refresh('ggtree', '~/tmp/git')
-.t = rtree(40)
-ggtree(.t, layout='daylight')+geom_tiplab()
+.phylo %>% ggtree(layout='daylight')+geom_tiplab()
 
-ggtree(.phylo, layout='unrooted')+
-geom_tiplab()
+.tree = rtree(40)
+ggtree(.tree, layout='equal_angle')+geom_tiplab()
+ggtree(.tree, layout='daylight')+geom_tiplab()
 ```
-
