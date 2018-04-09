@@ -324,35 +324,36 @@ circular.plot = function(edge, Ntip, Nnode, xx, yy, theta,
 }
 
 unrooted_xy = function(Ntip, Nnode, edge, edge.length, nb.sp, rotate.tree=0) {
-  unrooted_impl = function(node, ANGLE, AXIS) {
-    ind = which(edge[, 1] == node)
-    sons = edge[ind, 2]
-    start = AXIS - ANGLE / 2
-    for (i in 1:length(sons)) {
-      h = edge.length[ind[i]]
-      angle[sons[i]] <<- alpha <- ANGLE * nb.sp[sons[i]] / nb.sp[node]
-      axis[sons[i]] <<- beta <- start + alpha / 2
+  unrooted_impl = function(df, parent, parent_angle, parent_axis) {
+    row_indices = which(edge[, 1] == parent)
+    start = parent_axis - parent_angle / 2
+    for (row_i in row_indices) {
+      h = edge.length[row_i]
+      son_i = edge[row_i, 2L]
+      alpha = parent_angle * nb.sp[son_i] / nb.sp[parent]
+      beta = start + alpha / 2
       start = start + alpha
-      xx[sons[i]] <<- h * cos(beta) + xx[node]
-      yy[sons[i]] <<- h * sin(beta) + yy[node]
+      df$angle[son_i] = alpha
+      df$axis[son_i] = beta
+      df$x[son_i] = h * cos(beta) + df$x[parent]
+      df$y[son_i] = h * sin(beta) + df$y[parent]
     }
-    for (i in sons) {
-      if (i > Ntip) {unrooted_impl(i, angle[i], axis[i])}
+    sons = edge[row_indices, 2]
+    for (son_i in sons[sons > Ntip]) {
+      df = unrooted_impl(df, son_i, df$angle[son_i], df$axis[son_i])
     }
+    df
   }
-  Nedge = dim(edge)[1]
-  yy = xx = numeric(Ntip + Nnode)
+  v = numeric(Ntip + Nnode)
+  df = tibble::tibble(x = v, y = v, angle = v, axis = v)
   ## `angle': the angle allocated to each node wrt their nb of tips
   ## `axis': the axis of each branch
-  axis = angle = numeric(Ntip + Nnode)
   ## start with the root...
-  unrooted_impl(Ntip + 1L, 2 * pi, 0 + rotate.tree)
-
-  M = cbind(xx, yy)
-  axe = axis[1:Ntip] # the axis of the terminal branches (for export)
-  axeGTpi = axe > pi
+  df = unrooted_impl(df, Ntip + 1L, 2 * pi, 0 + rotate.tree)
+  M = cbind(df$x, df$y)
+  axe = head(df$axis, Ntip) # the axis of the terminal branches (for export)
   ## make sure that the returned angles are in [-PI, +PI]:
-  axe[axeGTpi] = axe[axeGTpi] - 2 * pi
+  axe = ifelse(axe > pi, axe - 2 * pi, axe)
   list(M = M, axe = axe)
 }
 
