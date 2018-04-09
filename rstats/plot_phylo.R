@@ -324,44 +324,38 @@ circular.plot = function(edge, Ntip, Nnode, xx, yy, theta,
 }
 
 unrooted_xy = function(Ntip, Nnode, edge, edge.length, nb.sp, rotate.tree=0) {
-  unrooted_impl = function(df, parent) {
-    parent_x = df$x[parent]
-    parent_y = df$y[parent]
-    parent_angle = df$angle[parent]
-    parent_axis = df$axis[parent]
-    parent_depth = df$depth[parent]
-    edge_indices = which(edge[, 1] == parent)
-    start = parent_axis - parent_angle / 2
+  unrooted_impl = function(parent) {
+    edge_indices = which(edge[, 1] == parent$id)
+    START = parent$axis - parent$angle / 2
+    this_df = NULL
     for (edge_i in edge_indices) {
       h = edge.length[edge_i]
-      son_i = edge[edge_i, 2L]
-      alpha = parent_angle * nb.sp[son_i] / parent_depth
-      beta = start + alpha / 2
-      start = start + alpha
-      df$angle[son_i] = alpha
-      df$axis[son_i] = beta
-      df$x[son_i] = h * cos(beta) + parent_x
-      df$y[son_i] = h * sin(beta) + parent_y
-      if (son_i > Ntip) {
-        df = unrooted_impl(df, son_i)
+      child_df = tibble::tibble(
+        id = edge[edge_i, 2L],
+        depth = nb.sp[.data$id],
+        angle = parent$angle * .data$depth / parent$depth,
+        axis = START + .data$angle / 2,
+        x = h * cos(.data$axis) + parent$x,
+        y = h * sin(.data$axis) + parent$y,
+      )
+      START = START + child_df$angle
+      this_df = dplyr::bind_rows(this_df, child_df)
+      if (child_df$id > Ntip) {
+        this_df = dplyr::bind_rows(this_df, unrooted_impl(child_df))
       }
     }
-    df
+    this_df
   }
-  v = numeric(Ntip + Nnode)
-  df = tibble::tibble(x = v, y = v, angle = v, axis = v, depth = nb.sp)
   ## `angle': the angle allocated to each node wrt their nb of tips
   ## `axis': the axis of each branch
-  ## start with the root...
-  row_root = Ntip + 1L
-  df$angle[row_root] = 2 * pi
-  df$axis[row_root] = 0 + rotate.tree
-  df = unrooted_impl(df, row_root)
-  M = cbind(df$x, df$y)
+  root = tibble::tibble(id = Ntip + 1L, x = 0, y = 0, angle = 2 * pi, axis = 0 + rotate.tree, depth = nb.sp[id])
+  df = unrooted_impl(root) %>%
+    dplyr::bind_rows(root) %>%
+    dplyr::arrange(id)
   axe = head(df$axis, Ntip) # the axis of the terminal branches (for export)
   ## make sure that the returned angles are in [-PI, +PI]:
   axe = ifelse(axe > pi, axe - 2 * pi, axe)
-  list(M = M, axe = axe)
+  list(M = cbind(df$x, df$y), axe = axe)
 }
 
 node.depth = function(phy, method = 1) {
