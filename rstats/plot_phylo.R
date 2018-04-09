@@ -75,9 +75,9 @@ plot_phylo = function(x, type = "unrooted", use.edge.length = TRUE,
     }, "unrooted" = {
       nb.sp = C_nodeDepth(Ntip, Nnode, z$edge, Nedge, node.depth)
       XY = if (use.edge.length) {
-        unrooted.xy(Ntip, Nnode, z$edge, z$edge.length, nb.sp, rotate.tree)
+        unrooted_xy(Ntip, Nnode, z$edge, z$edge.length, nb.sp, rotate.tree)
       } else {
-        unrooted.xy(Ntip, Nnode, z$edge, rep(1, Nedge), nb.sp, rotate.tree)
+        unrooted_xy(Ntip, Nnode, z$edge, rep(1, Nedge), nb.sp, rotate.tree)
       }
       ## rescale so that we have only positive values
       xx = XY$M[, 1] - min(XY$M[, 1])
@@ -193,9 +193,6 @@ plot_phylo = function(x, type = "unrooted", use.edge.length = TRUE,
     if (is.null(adj)) {
       adj = if (phyloORclado && direction == "leftwards") 1 else 0
     }
-    if (phyloORclado && show.tip.label) {
-      stop("phyloORclado not supported")
-    }
     if (type == "phylogram") {
       stop("phyloORclado not supported")
     } else {
@@ -248,79 +245,6 @@ plot_phylo = function(x, type = "unrooted", use.edge.length = TRUE,
           )
         )
       }
-    }
-    if (show.tip.label) {
-      if (is.expression(x$tip.label)) underscore = TRUE
-      if (!underscore) x$tip.label = gsub("_", " ", x$tip.label)
-      if (phyloORclado) {
-        stop("phyloORclado not supported")
-      } else {
-        angle = if (type == "unrooted") XY$axe else atan2(yy[1:Ntip], xx[1:Ntip]) # in radians
-        lab4ut = if (is.null(lab4ut)) {
-          if (type == "unrooted") "horizontal" else "axial"
-        } else {
-          match.arg(lab4ut, c("horizontal", "axial"))
-        }
-        xx.tips = xx[1:Ntip]
-        yy.tips = yy[1:Ntip]
-        if (label.offset) {
-          xx.tips = xx.tips + label.offset * cos(angle)
-          yy.tips = yy.tips + label.offset * sin(angle)
-        }
-        if (lab4ut == "horizontal") {
-          y.adj = x.adj = numeric(Ntip)
-          sel = abs(angle) > 0.75 * pi
-          x.adj[sel] = -strwidth(x$tip.label)[sel] * 1.05
-          sel = abs(angle) > pi / 4 & abs(angle) < 0.75 * pi
-          x.adj[sel] = -strwidth(x$tip.label)[sel] * (2 * abs(angle)[sel] / pi - 0.5)
-          sel = angle > pi / 4 & angle < 0.75 * pi
-          y.adj[sel] = strheight(x$tip.label)[sel] / 2
-          sel = angle < -pi / 4 & angle > -0.75 * pi
-          y.adj[sel] = -strheight(x$tip.label)[sel] * 0.75
-          text(
-            xx.tips + x.adj * cex, yy.tips + y.adj * cex,
-            x$tip.label, adj = c(adj, 0), font = font,
-            srt = srt, cex = cex, col = tip.color
-          )
-        } else { # if lab4ut == "axial"
-          if (align.tip.label) {
-            POL = rect2polar(xx.tips, yy.tips)
-            POL$r[] = max(POL$r)
-            REC = polar2rect(POL$r, POL$angle)
-            xx.tips = REC$x
-            yy.tips = REC$y
-            segments(xx[1:Ntip], yy[1:Ntip], xx.tips, yy.tips, lty = align.tip.label.lty)
-          }
-          if (type == "unrooted") {
-            adj = abs(angle) > pi / 2
-            angle = angle * 180 / pi # switch to degrees
-            angle[adj] = angle[adj] - 180
-            adj = as.numeric(adj)
-          } else {
-            s = xx.tips < 0
-            angle = angle * 180 / pi
-            angle[s] = angle[s] + 180
-            adj = as.numeric(s)
-          }
-          ## `srt' takes only a single value, so can't vectorize this:
-          ## (and need to 'elongate' these vectors:)
-          font = rep(font, length.out = Ntip)
-          tip.color = rep(tip.color, length.out = Ntip)
-          cex = rep(cex, length.out = Ntip)
-          for (i in 1:Ntip)
-            text(
-              xx.tips[i], yy.tips[i], x$tip.label[i], font = font[i],
-              cex = cex[i], srt = angle[i], adj = adj[i],
-              col = tip.color[i]
-            )
-        }
-      }
-    }
-    if (show.node.label) {
-      text(
-        xx[ROOT:length(xx)] + label.offset, yy[ROOT:length(yy)],
-        x$node.label, adj = adj, font = font, srt = srt, cex = cex
-      )
     }
   }
   L = list(
@@ -399,8 +323,8 @@ circular.plot = function(edge, Ntip, Nnode, xx, yy, theta,
   }
 }
 
-unrooted.xy = function(Ntip, Nnode, edge, edge.length, nb.sp, rotate.tree) {
-  foo = function(node, ANGLE, AXIS) {
+unrooted_xy = function(Ntip, Nnode, edge, edge.length, nb.sp, rotate.tree=0) {
+  unrooted_impl = function(node, ANGLE, AXIS) {
     ind = which(edge[, 1] == node)
     sons = edge[ind, 2]
     start = AXIS - ANGLE / 2
@@ -412,8 +336,9 @@ unrooted.xy = function(Ntip, Nnode, edge, edge.length, nb.sp, rotate.tree) {
       xx[sons[i]] <<- h * cos(beta) + xx[node]
       yy[sons[i]] <<- h * sin(beta) + yy[node]
     }
-    for (i in sons)
-      if (i > Ntip) foo(i, angle[i], axis[i])
+    for (i in sons) {
+      if (i > Ntip) {unrooted_impl(i, angle[i], axis[i])}
+    }
   }
   Nedge = dim(edge)[1]
   yy = xx = numeric(Ntip + Nnode)
@@ -421,7 +346,7 @@ unrooted.xy = function(Ntip, Nnode, edge, edge.length, nb.sp, rotate.tree) {
   ## `axis': the axis of each branch
   axis = angle = numeric(Ntip + Nnode)
   ## start with the root...
-  foo(Ntip + 1L, 2 * pi, 0 + rotate.tree)
+  unrooted_impl(Ntip + 1L, 2 * pi, 0 + rotate.tree)
 
   M = cbind(xx, yy)
   axe = axis[1:Ntip] # the axis of the terminal branches (for export)
