@@ -358,57 +358,6 @@ unrooted_xy = function(Ntip, Nnode, edge, edge.length, nb.sp, rotate.tree=0) {
   list(M = cbind(df$x, df$y), axe = axe)
 }
 
-node.depth = function(phy, method = 1) {
-  n = length(phy$tip.label)
-  m = phy$Nnode
-  N = dim(phy$edge)[1]
-  phy = reorder(phy, order = "postorder")
-  .C(
-    node_depth, as.integer(n),
-    as.integer(phy$edge[, 1]), as.integer(phy$edge[, 2]),
-    as.integer(N), double(n + m), as.integer(method)
-  )[[5]]
-}
-
-node.depth.edgelength = function(phy) {
-  n = length(phy$tip.label)
-  m = phy$Nnode
-  N = dim(phy$edge)[1]
-  phy = reorder(phy, order = "postorder")
-  .C(
-    node_depth_edgelength, as.integer(phy$edge[, 1]),
-    as.integer(phy$edge[, 2]), as.integer(N),
-    as.double(phy$edge.length), double(n + m)
-  )[[5]]
-}
-
-node.height = function(phy, clado.style = FALSE) {
-  n = length(phy$tip.label)
-  m = phy$Nnode
-  N = dim(phy$edge)[1]
-
-  phy = reorder(phy)
-  yy = numeric(n + m)
-  e2 = phy$edge[, 2]
-  yy[e2[e2 <= n]] = 1:n
-
-  phy = reorder(phy, order = "postorder")
-  e1 = phy$edge[, 1]
-  e2 = phy$edge[, 2]
-
-  if (clado.style) {
-    .C(
-      node_height_clado, as.integer(n), as.integer(e1),
-      as.integer(e2), as.integer(N), double(n + m), as.double(yy)
-    )[[5]]
-  } else {
-    .C(
-      node_height, as.integer(e1), as.integer(e2), as.integer(N),
-      as.double(yy)
-    )[[4]]
-  }
-}
-
 C_nodeHeight = function(edge, Nedge, yy) {
   .C(
     node_height, as.integer(edge[, 1]), as.integer(edge[, 2]),
@@ -430,24 +379,4 @@ C_nodeDepthEdgelength = function(Ntip, Nnode, edge, Nedge, edge.length) {
     as.integer(edge[, 2]), as.integer(Nedge),
     as.double(edge.length), double(Ntip + Nnode)
   )[[5]]
-}
-
-## Function to compute the axis limit
-## x: vector of coordinates, must be positive (or at least the largest value)
-## lab: vector of labels, length(x) == length(lab)
-## sin: size of the device in inches
-getLimit = function(x, lab, sin, cex) {
-  s = strwidth(lab, "inches", cex = cex) # width of the tip labels
-  ## if at least one string is larger than the device,
-  ## give 1/3 of the plot for the tip labels:
-  if (any(s > sin)) return(1.5 * max(x))
-  Limit = 0
-  while (any(x > Limit)) {
-    i = which.max(x)
-    ## 'alp' is the conversion coeff from inches to user coordinates:
-    alp = x[i] / (sin - s[i])
-    Limit = x[i] + alp * s[i]
-    x = x + alp * s
-  }
-  Limit
 }
