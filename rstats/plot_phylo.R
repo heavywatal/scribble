@@ -324,32 +324,39 @@ circular.plot = function(edge, Ntip, Nnode, xx, yy, theta,
 }
 
 unrooted_xy = function(Ntip, Nnode, edge, edge.length, nb.sp, rotate.tree=0) {
-  unrooted_impl = function(df, parent, parent_angle, parent_axis) {
-    row_indices = which(edge[, 1] == parent)
+  unrooted_impl = function(df, parent) {
+    parent_x = df$x[parent]
+    parent_y = df$y[parent]
+    parent_angle = df$angle[parent]
+    parent_axis = df$axis[parent]
+    parent_depth = df$depth[parent]
+    edge_indices = which(edge[, 1] == parent)
     start = parent_axis - parent_angle / 2
-    for (row_i in row_indices) {
-      h = edge.length[row_i]
-      son_i = edge[row_i, 2L]
-      alpha = parent_angle * nb.sp[son_i] / nb.sp[parent]
+    for (edge_i in edge_indices) {
+      h = edge.length[edge_i]
+      son_i = edge[edge_i, 2L]
+      alpha = parent_angle * nb.sp[son_i] / parent_depth
       beta = start + alpha / 2
       start = start + alpha
       df$angle[son_i] = alpha
       df$axis[son_i] = beta
-      df$x[son_i] = h * cos(beta) + df$x[parent]
-      df$y[son_i] = h * sin(beta) + df$y[parent]
-    }
-    sons = edge[row_indices, 2]
-    for (son_i in sons[sons > Ntip]) {
-      df = unrooted_impl(df, son_i, df$angle[son_i], df$axis[son_i])
+      df$x[son_i] = h * cos(beta) + parent_x
+      df$y[son_i] = h * sin(beta) + parent_y
+      if (son_i > Ntip) {
+        df = unrooted_impl(df, son_i)
+      }
     }
     df
   }
   v = numeric(Ntip + Nnode)
-  df = tibble::tibble(x = v, y = v, angle = v, axis = v)
+  df = tibble::tibble(x = v, y = v, angle = v, axis = v, depth = nb.sp)
   ## `angle': the angle allocated to each node wrt their nb of tips
   ## `axis': the axis of each branch
   ## start with the root...
-  df = unrooted_impl(df, Ntip + 1L, 2 * pi, 0 + rotate.tree)
+  row_root = Ntip + 1L
+  df$angle[row_root] = 2 * pi
+  df$axis[row_root] = 0 + rotate.tree
+  df = unrooted_impl(df, row_root)
   M = cbind(df$x, df$y)
   axe = head(df$axis, Ntip) # the axis of the terminal branches (for export)
   ## make sure that the returned angles are in [-PI, +PI]:
