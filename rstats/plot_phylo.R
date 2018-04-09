@@ -1,13 +1,4 @@
-## plot.phylo.R (2017-12-23)
-
-##   Plot Phylogenies
-
-## Copyright 2002-2017 Emmanuel Paradis
-
-## This file is part of the R-package `ape'.
-## See the file ../COPYING for licensing issues.
-
-plot.phylo = function(x, type = "phylogram", use.edge.length = TRUE,
+plot_phylo = function(x, type = "unrooted", use.edge.length = TRUE,
                       node.pos = NULL, show.tip.label = TRUE,
                       show.node.label = FALSE, edge.color = "black",
                       edge.width = 1, edge.lty = 1, font = 3, cex = par("cex"),
@@ -17,137 +8,40 @@ plot.phylo = function(x, type = "phylogram", use.edge.length = TRUE,
                       tip.color = "black", plot = TRUE, rotate.tree = 0,
                       open.angle = 0, node.depth = 1, align.tip.label = FALSE, ...) {
   Ntip = length(x$tip.label)
-  if (Ntip < 2) {
-    warning("found less than 2 tips in the tree")
-    return(NULL)
-  }
-
-  .nodeHeight = function(edge, Nedge, yy)
-    .C(
-      node_height, as.integer(edge[, 1]), as.integer(edge[, 2]),
-      as.integer(Nedge), as.double(yy)
-    )[[4]]
-
-  .nodeDepth = function(Ntip, Nnode, edge, Nedge, node.depth)
-    .C(
-      node_depth, as.integer(Ntip),
-      as.integer(edge[, 1]), as.integer(edge[, 2]),
-      as.integer(Nedge), double(Ntip + Nnode), as.integer(node.depth)
-    )[[5]]
-
-  .nodeDepthEdgelength = function(Ntip, Nnode, edge, Nedge, edge.length)
-    .C(
-      node_depth_edgelength, as.integer(edge[, 1]),
-      as.integer(edge[, 2]), as.integer(Nedge),
-      as.double(edge.length), double(Ntip + Nnode)
-    )[[5]]
-
   Nedge = dim(x$edge)[1]
   Nnode = x$Nnode
-  if (any(x$edge < 1) || any(x$edge > Ntip + Nnode)) {
-    stop("tree badly conformed; cannot plot. Check the edge matrix.")
-  }
   ROOT = Ntip + 1
-  type = match.arg(type, c(
-    "phylogram", "cladogram", "fan",
-    "unrooted", "radial"
-  ))
-  direction = match.arg(direction, c(
-    "rightwards", "leftwards",
-    "upwards", "downwards"
-  ))
+  type = match.arg(type, c("phylogram", "cladogram", "fan", "unrooted", "radial"))
+  direction = match.arg(direction, c("rightwards", "leftwards", "upwards", "downwards"))
   if (is.null(x$edge.length)) {
     use.edge.length = FALSE
-  } else {
-    if (use.edge.length && type != "radial") {
-      tmp = sum(is.na(x$edge.length))
-      if (tmp) {
-        warning(paste(tmp, "branch length(s) NA(s): branch lengths ignored in the plot"))
-        use.edge.length = FALSE
-      }
-    }
   }
-
   if (is.numeric(align.tip.label)) {
     align.tip.label.lty = align.tip.label
     align.tip.label = TRUE
   } else { # assumes is.logical(align.tip.labels) == TRUE
     if (align.tip.label) align.tip.label.lty = 3
   }
-
   if (align.tip.label) {
     if (type %in% c("unrooted", "radial") || !use.edge.length || is.ultrametric(x)) {
       align.tip.label = FALSE
     }
   }
-
   ## the order of the last two conditions is important:
   if (type %in% c("unrooted", "radial") || !use.edge.length ||
-    is.null(x$root.edge) || !x$root.edge) {
+      is.null(x$root.edge) || !x$root.edge) {
     root.edge = FALSE
   }
-
   phyloORclado = type %in% c("phylogram", "cladogram")
   horizontal = direction %in% c("rightwards", "leftwards")
   xe = x$edge # to save
   if (phyloORclado) {
-    ## we first compute the y-coordinates of the tips.
-    phyOrder = attr(x, "order")
-    ## make sure the tree is in cladewise order:
-    if (is.null(phyOrder) || phyOrder != "cladewise") {
-      x = reorder(x) # fix from Klaus Schliep (2007-06-16)
-      if (!identical(x$edge, xe)) {
-        ## modified from Li-San Wang's fix (2007-01-23):
-        ereorder = match(x$edge[, 2], xe[, 2])
-        if (length(edge.color) > 1) {
-          edge.color = rep(edge.color, length.out = Nedge)
-          edge.color = edge.color[ereorder]
-        }
-        if (length(edge.width) > 1) {
-          edge.width = rep(edge.width, length.out = Nedge)
-          edge.width = edge.width[ereorder]
-        }
-        if (length(edge.lty) > 1) {
-          edge.lty = rep(edge.lty, length.out = Nedge)
-          edge.lty = edge.lty[ereorder]
-        }
-      }
-    }
-    ### By contrats to ape (< 2.4), the arguments edge.color, etc., are
-    ### not elongated before being passed to segments(), except if needed
-    ### to be reordered
-    yy = numeric(Ntip + Nnode)
-    TIPS = x$edge[x$edge[, 2] <= Ntip, 2]
-    yy[TIPS] = 1:Ntip
+    stop("phyloORclado not supported")
   }
   ## 'z' is the tree in postorder order used in calls to .C
   z = reorder(x, order = "postorder")
-
   if (phyloORclado) {
-    if (is.null(node.pos)) {
-      node.pos =
-        if (type == "cladogram" && !use.edge.length) 2 else 1
-    }
-
-    if (node.pos == 1) {
-      yy = .nodeHeight(z$edge, Nedge, yy)
-    } else {
-      ## node_height_clado requires the number of descendants
-      ## for each node, so we compute `xx' at the same time
-      ans = .C(
-        node_height_clado, as.integer(Ntip),
-        as.integer(z$edge[, 1]), as.integer(z$edge[, 2]),
-        as.integer(Nedge), double(Ntip + Nnode), as.double(yy)
-      )
-      xx = ans[[5]] - 1
-      yy = ans[[6]]
-    }
-    if (!use.edge.length) {
-      if (node.pos != 2) xx = .nodeDepth(Ntip, Nnode, z$edge, Nedge, node.depth) - 1
-      xx = max(xx) - xx
-    } else {
-      xx = .nodeDepthEdgelength(Ntip, Nnode, z$edge, Nedge, z$edge.length)
-    }
+    stop("phyloORclado not supported")
   } else {
     twopi = 2 * pi
     rotate.tree = twopi * rotate.tree / 360
@@ -167,11 +61,11 @@ plot.phylo = function(x, type = "phylogram", use.edge.length = TRUE,
     }
 
     switch(type, "fan" = {
-      theta = .nodeHeight(z$edge, Nedge, theta)
+      theta = C_nodeHeight(z$edge, Nedge, theta)
       if (use.edge.length) {
-        r = .nodeDepthEdgelength(Ntip, Nnode, z$edge, Nedge, z$edge.length)
+        r = C_nodeDepthEdgelength(Ntip, Nnode, z$edge, Nedge, z$edge.length)
       } else {
-        r = .nodeDepth(Ntip, Nnode, z$edge, Nedge, node.depth)
+        r = C_nodeDepth(Ntip, Nnode, z$edge, Nedge, node.depth)
         r = 1 / r
       }
       theta = theta + rotate.tree
@@ -179,7 +73,7 @@ plot.phylo = function(x, type = "phylogram", use.edge.length = TRUE,
       xx = r * cos(theta)
       yy = r * sin(theta)
     }, "unrooted" = {
-      nb.sp = .nodeDepth(Ntip, Nnode, z$edge, Nedge, node.depth)
+      nb.sp = C_nodeDepth(Ntip, Nnode, z$edge, Nedge, node.depth)
       XY = if (use.edge.length) {
         unrooted.xy(Ntip, Nnode, z$edge, z$edge.length, nb.sp, rotate.tree)
       } else {
@@ -189,70 +83,23 @@ plot.phylo = function(x, type = "phylogram", use.edge.length = TRUE,
       xx = XY$M[, 1] - min(XY$M[, 1])
       yy = XY$M[, 2] - min(XY$M[, 2])
     }, "radial" = {
-      r = .nodeDepth(Ntip, Nnode, z$edge, Nedge, node.depth)
+      r = C_nodeDepth(Ntip, Nnode, z$edge, Nedge, node.depth)
       r[r == 1] = 0
       r = 1 - r / Ntip
-      theta = .nodeHeight(z$edge, Nedge, theta) + rotate.tree
+      theta = C_nodeHeight(z$edge, Nedge, theta) + rotate.tree
       xx = r * cos(theta)
       yy = r * sin(theta)
     })
   }
-
   if (phyloORclado) {
-    if (!horizontal) {
-      tmp = yy
-      yy = xx
-      xx = tmp - min(tmp) + 1
-    }
-    if (root.edge) {
-      if (direction == "rightwards") xx = xx + x$root.edge
-      if (direction == "upwards") yy = yy + x$root.edge
-    }
+    stop("phyloORclado not supported")
   }
-
   if (no.margin) par(mai = rep(0, 4))
-
   if (show.tip.label) nchar.tip.label = nchar(x$tip.label)
   max.yy = max(yy)
-
-  ## Function to compute the axis limit
-  ## x: vector of coordinates, must be positive (or at least the largest value)
-  ## lab: vector of labels, length(x) == length(lab)
-  ## sin: size of the device in inches
-  getLimit = function(x, lab, sin, cex) {
-    s = strwidth(lab, "inches", cex = cex) # width of the tip labels
-    ## if at least one string is larger than the device,
-    ## give 1/3 of the plot for the tip labels:
-    if (any(s > sin)) return(1.5 * max(x))
-    Limit = 0
-    while (any(x > Limit)) {
-      i = which.max(x)
-      ## 'alp' is the conversion coeff from inches to user coordinates:
-      alp = x[i] / (sin - s[i])
-      Limit = x[i] + alp * s[i]
-      x = x + alp * s
-    }
-    Limit
-  }
-
   if (is.null(x.lim)) {
     if (phyloORclado) {
-      if (horizontal) {
-        ## 1.04 comes from that we are using a regular axis system
-        ## with 4% on both sides of the range of x:
-        ## REMOVED (2017-06-14)
-        xx.tips = xx[1:Ntip] # * 1.04
-        if (show.tip.label) {
-          pin1 = par("pin")[1] # width of the device in inches
-          tmp = getLimit(xx.tips, x$tip.label, pin1, cex)
-          tmp = tmp + label.offset
-        } else {
-          tmp = max(xx.tips)
-        }
-        x.lim = c(0, tmp)
-      } else {
-        x.lim = c(1, Ntip)
-      }
+      stop("phyloORclado not supported")
     } else {
       switch(type, "fan" = {
         if (show.tip.label) {
@@ -296,22 +143,7 @@ plot.phylo = function(x, type = "phylogram", use.edge.length = TRUE,
   if (phyloORclado && direction == "leftwards") xx = x.lim[2] - xx
   if (is.null(y.lim)) {
     if (phyloORclado) {
-      if (horizontal) {
-        y.lim = c(1, Ntip)
-      } else {
-        pin2 = par("pin")[2] # height of the device in inches
-        ## 1.04 comes from that we are using a regular axis system
-        ## with 4% on both sides of the range of x:
-        ## REMOVED (2017-06-14)
-        yy.tips = yy[1:Ntip] # * 1.04
-        if (show.tip.label) {
-          tmp = getLimit(yy.tips, x$tip.label, pin2, cex)
-          tmp = tmp + label.offset
-        } else {
-          tmp = max(yy.tips)
-        }
-        y.lim = c(0, tmp)
-      }
+      stop("phyloORclado not supported")
     } else {
       switch(type, "fan" = {
         if (show.tip.label) {
@@ -357,39 +189,15 @@ plot.phylo = function(x, type = "phylogram", use.edge.length = TRUE,
     0, type = "n", xlim = x.lim, ylim = y.lim, xlab = "",
     ylab = "", axes = FALSE, asp = asp, ...
   )
-
   if (plot) {
     if (is.null(adj)) {
       adj = if (phyloORclado && direction == "leftwards") 1 else 0
     }
     if (phyloORclado && show.tip.label) {
-      MAXSTRING = max(strwidth(x$tip.label, cex = cex))
-      loy = 0
-      if (direction == "rightwards") {
-        lox = label.offset + MAXSTRING * 1.05 * adj
-      }
-      if (direction == "leftwards") {
-        lox = -label.offset - MAXSTRING * 1.05 * (1 - adj)
-        ## xx = xx + MAXSTRING
-      }
-      if (!horizontal) {
-        psr = par("usr")
-        MAXSTRING = MAXSTRING * 1.09 * (psr[4] - psr[3]) / (psr[2] - psr[1])
-        loy = label.offset + MAXSTRING * 1.05 * adj
-        lox = 0
-        srt = 90 + srt
-        if (direction == "downwards") {
-          loy = -loy
-          ## yy = yy + MAXSTRING
-          srt = 180 + srt
-        }
-      }
+      stop("phyloORclado not supported")
     }
     if (type == "phylogram") {
-      phylogram.plot(
-        x$edge, Ntip, Nnode, xx, yy,
-        horizontal, edge.color, edge.width, edge.lty
-      )
+      stop("phyloORclado not supported")
     } else {
       if (type == "fan") {
         ereorder = match(z$edge[, 2], x$edge[, 2])
@@ -444,47 +252,21 @@ plot.phylo = function(x, type = "phylogram", use.edge.length = TRUE,
     if (show.tip.label) {
       if (is.expression(x$tip.label)) underscore = TRUE
       if (!underscore) x$tip.label = gsub("_", " ", x$tip.label)
-
       if (phyloORclado) {
-        if (align.tip.label) {
-          xx.tmp = switch(direction,
-            "rightwards" = max(xx[1:Ntip]),
-            "leftwards" = min(xx[1:Ntip]),
-            "upwards" = xx[1:Ntip],
-            "downwards" = xx[1:Ntip]
-          )
-          yy.tmp = switch(direction,
-            "rightwards" = yy[1:Ntip],
-            "leftwards" = yy[1:Ntip],
-            "upwards" = max(yy[1:Ntip]),
-            "downwards" = min(yy[1:Ntip])
-          )
-          segments(xx[1:Ntip], yy[1:Ntip], xx.tmp, yy.tmp, lty = align.tip.label.lty)
-        } else {
-          xx.tmp = xx[1:Ntip]
-          yy.tmp = yy[1:Ntip]
-        }
-        text(
-          xx.tmp + lox, yy.tmp + loy, x$tip.label, adj = adj,
-          font = font, srt = srt, cex = cex, col = tip.color
-        )
+        stop("phyloORclado not supported")
       } else {
         angle = if (type == "unrooted") XY$axe else atan2(yy[1:Ntip], xx[1:Ntip]) # in radians
-
-        lab4ut =
-          if (is.null(lab4ut)) {
-            if (type == "unrooted") "horizontal" else "axial"
-          } else {
-            match.arg(lab4ut, c("horizontal", "axial"))
-          }
-
+        lab4ut = if (is.null(lab4ut)) {
+          if (type == "unrooted") "horizontal" else "axial"
+        } else {
+          match.arg(lab4ut, c("horizontal", "axial"))
+        }
         xx.tips = xx[1:Ntip]
         yy.tips = yy[1:Ntip]
         if (label.offset) {
           xx.tips = xx.tips + label.offset * cos(angle)
           yy.tips = yy.tips + label.offset * sin(angle)
         }
-
         if (lab4ut == "horizontal") {
           y.adj = x.adj = numeric(Ntip)
           sel = abs(angle) > 0.75 * pi
@@ -559,113 +341,9 @@ plot.phylo = function(x, type = "phylogram", use.edge.length = TRUE,
   invisible(L)
 }
 
-phylogram.plot = function(edge, Ntip, Nnode, xx, yy, horizontal,
-                           edge.color, edge.width, edge.lty) {
-  nodes = (Ntip + 1):(Ntip + Nnode)
-  if (!horizontal) {
-    tmp = yy
-    yy = xx
-    xx = tmp
-  }
-  ## un trait vertical a chaque noeud...
-  x0v = xx[nodes]
-  y0v = y1v = numeric(Nnode)
-
-  ## store the index of each node in the 1st column of edge:
-  NodeInEdge1 = vector("list", Nnode)
-  e1 = edge[, 1]
-  for (i in seq_along(e1)) {
-    j = e1[i] - Ntip
-    NodeInEdge1[[j]] = c(NodeInEdge1[[j]], i)
-  }
-
-  for (i in 1:Nnode) {
-    j = NodeInEdge1[[i]]
-    tmp = range(yy[edge[j, 2]])
-    y0v[i] = tmp[1]
-    y1v[i] = tmp[2]
-  }
-  ## ... et un trait horizontal partant de chaque tip et chaque noeud
-  ##  vers la racine
-  x0h = xx[edge[, 1]]
-  x1h = xx[edge[, 2]]
-  y0h = yy[edge[, 2]]
-
-  nc = length(edge.color)
-  nw = length(edge.width)
-  nl = length(edge.lty)
-
-  if (nc + nw + nl == 3) {
-    color.v = edge.color
-    width.v = edge.width
-    lty.v = edge.lty
-  } else {
-    Nedge = dim(edge)[1]
-    edge.color = rep(edge.color, length.out = Nedge)
-    edge.width = rep(edge.width, length.out = Nedge)
-    edge.lty = rep(edge.lty, length.out = Nedge)
-    DF = data.frame(edge.color, edge.width, edge.lty, stringsAsFactors = FALSE)
-    color.v = rep("black", Nnode)
-    width.v = rep(1, Nnode)
-    lty.v = rep(1, Nnode)
-    for (i in 1:Nnode) {
-      br = NodeInEdge1[[i]]
-      if (length(br) == 1) {
-        A = br[1]
-        color.v[i] = edge.color[A]
-        width.v[i] = edge.width[A]
-        lty.v[i] = edge.lty[A]
-      } else if (length(br) > 2) {
-        x = unique(DF[br, 1])
-        if (length(x) == 1) color.v[i] = x
-        x = unique(DF[br, 2])
-        if (length(x) == 1) width.v[i] = x
-        x = unique(DF[br, 3])
-        if (length(x) == 1) lty.v[i] = x
-      } else { # length(br) == 2
-        A = br[1]
-        B = br[2]
-        if (any(DF[A, ] != DF[B, ])) {
-          color.v[i] = edge.color[B]
-          width.v[i] = edge.width[B]
-          lty.v[i] = edge.lty[B]
-          ## add a new line:
-          y0v = c(y0v, y0v[i])
-          y1v = c(y1v, yy[i + Ntip])
-          x0v = c(x0v, x0v[i])
-          color.v = c(color.v, edge.color[A])
-          width.v = c(width.v, edge.width[A])
-          lty.v = c(lty.v, edge.lty[A])
-          ## shorten the line:
-          y0v[i] = yy[i + Ntip]
-        } else {
-          color.v[i] = edge.color[A]
-          width.v[i] = edge.width[A]
-          lty.v[i] = edge.lty[A]
-        }
-      }
-    }
-  }
-
-  if (horizontal) {
-    segments(x0h, y0h, x1h, y0h, col = edge.color, lwd = edge.width, lty = edge.lty) # draws horizontal lines
-    segments(x0v, y0v, x0v, y1v, col = color.v, lwd = width.v, lty = lty.v) # draws vertical lines
-  } else {
-    segments(y0h, x0h, y0h, x1h, col = edge.color, lwd = edge.width, lty = edge.lty) # draws vertical lines
-    segments(y0v, x0v, y1v, x0v, col = color.v, lwd = width.v, lty = lty.v) # draws horizontal lines
-  }
-}
-
-cladogram.plot = function(edge, xx, yy, edge.color, edge.width, edge.lty)
-  segments(
-    xx[edge[, 1]], yy[edge[, 1]], xx[edge[, 2]], yy[edge[, 2]],
-    col = edge.color, lwd = edge.width, lty = edge.lty
-  )
-
 circular.plot = function(edge, Ntip, Nnode, xx, yy, theta,
-                          r, edge.color, edge.width, edge.lty)
+                         r, edge.color, edge.width, edge.lty) {
                         ### 'edge' must be in postorder order
-{
   r0 = r[edge[, 1]]
   r1 = r[edge[, 2]]
   theta0 = theta[edge[, 2]]
@@ -728,11 +406,11 @@ unrooted.xy = function(Ntip, Nnode, edge, edge.length, nb.sp, rotate.tree) {
     start = AXIS - ANGLE / 2
     for (i in 1:length(sons)) {
       h = edge.length[ind[i]]
-      angle[sons[i]] <= alpha = ANGLE * nb.sp[sons[i]] / nb.sp[node]
-      axis[sons[i]] <= beta = start + alpha / 2
+      angle[sons[i]] <<- alpha <- ANGLE * nb.sp[sons[i]] / nb.sp[node]
+      axis[sons[i]] <<- beta <- start + alpha / 2
       start = start + alpha
-      xx[sons[i]] <= h * cos(beta) + xx[node]
-      yy[sons[i]] <= h * sin(beta) + yy[node]
+      xx[sons[i]] <<- h * cos(beta) + xx[node]
+      yy[sons[i]] <<- h * sin(beta) + yy[node]
     }
     for (i in sons)
       if (i > Ntip) foo(i, angle[i], axis[i])
@@ -804,93 +482,45 @@ node.height = function(phy, clado.style = FALSE) {
   }
 }
 
-plot.multiPhylo = function(x, layout = 1, ...) {
-  layout(matrix(1:layout, ceiling(sqrt(layout)), byrow = TRUE))
-  if (!devAskNewPage() && !names(dev.cur()) %in% c("pdf", "postscript")) {
-    devAskNewPage(TRUE)
-    on.exit(devAskNewPage(FALSE))
-  }
-  for (i in seq_along(x)) plot(x[[i]], ...)
+C_nodeHeight = function(edge, Nedge, yy) {
+  .C(
+    node_height, as.integer(edge[, 1]), as.integer(edge[, 2]),
+    as.integer(Nedge), as.double(yy)
+  )[[4]]
 }
 
-trex = function(phy, title = TRUE, subbg = "lightyellow3",
-                 return.tree = FALSE, ...) {
-  lastPP = get("last_plot.phylo", envir = .PlotPhyloEnv)
-  devmain = dev.cur() # where the main tree is plotted
-
-  restore = function() {
-    dev.set(devmain)
-    assign("last_plot.phylo", lastPP, envir = .PlotPhyloEnv)
-  }
-
-  on.exit(restore())
-  NEW = TRUE
-  cat("Click close to a node. Right-click to exit.\n")
-  repeat {
-    x = identify.phylo(phy, quiet = TRUE)
-    if (is.null(x)) {
-      return(invisible(NULL))
-    } else {
-      x = x$nodes
-      if (is.null(x)) {
-        cat("Try again!\n")
-      } else {
-        if (NEW) {
-          dev.new()
-          par(bg = subbg)
-          devsub = dev.cur()
-          NEW = FALSE
-        } else {
-          dev.set(devsub)
-        }
-
-        tr = extract.clade(phy, x)
-        plot(tr, ...)
-        if (is.character(title)) {
-          title(title)
-        } else if (title) {
-          tl =
-            if (is.null(phy$node.label)) {
-              paste("From node #", x, sep = "")
-            } else {
-              paste("From", phy$node.label[x - Ntip(phy)])
-            }
-          title(tl)
-        }
-        if (return.tree) return(tr)
-        restore()
-      }
-    }
-  }
+C_nodeDepth = function(Ntip, Nnode, edge, Nedge, node.depth) {
+  .C(
+    node_depth, as.integer(Ntip),
+    as.integer(edge[, 1]), as.integer(edge[, 2]),
+    as.integer(Nedge), double(Ntip + Nnode), as.integer(node.depth)
+  )[[5]]
 }
 
-kronoviz = function(x, layout = length(x), horiz = TRUE, ...) {
-  par(mar = rep(0.5, 4), oma = rep(2, 4))
-  rts = sapply(x, function(x) branching.times(x)[1])
-  maxrts = max(rts)
-  lim = cbind(rts - maxrts, rts)
-  Ntree = length(x)
-  Ntips = sapply(x, Ntip)
-  if (horiz) {
-    nrow = layout
-    w = 1
-    h = Ntips
-  } else {
-    nrow = 1
-    w = Ntips
-    h = 1
+C_nodeDepthEdgelength = function(Ntip, Nnode, edge, Nedge, edge.length) {
+  .C(
+    node_depth_edgelength, as.integer(edge[, 1]),
+    as.integer(edge[, 2]), as.integer(Nedge),
+    as.double(edge.length), double(Ntip + Nnode)
+  )[[5]]
+}
+
+## Function to compute the axis limit
+## x: vector of coordinates, must be positive (or at least the largest value)
+## lab: vector of labels, length(x) == length(lab)
+## sin: size of the device in inches
+getLimit = function(x, lab, sin, cex) {
+  s = strwidth(lab, "inches", cex = cex) # width of the tip labels
+  ## if at least one string is larger than the device,
+  ## give 1/3 of the plot for the tip labels:
+  if (any(s > sin)) return(1.5 * max(x))
+  Limit = 0
+  while (any(x > Limit)) {
+    i = which.max(x)
+    ## 'alp' is the conversion coeff from inches to user coordinates:
+    alp = x[i] / (sin - s[i])
+    Limit = x[i] + alp * s[i]
+    x = x + alp * s
   }
-  layout(matrix(1:layout, nrow), widths = w, heights = h)
-  if (layout < Ntree && !devAskNewPage() && interactive()) {
-    devAskNewPage(TRUE)
-    on.exit(devAskNewPage(FALSE))
-  }
-  if (horiz) {
-    for (i in 1:Ntree)
-      plot(x[[i]], x.lim = lim[i, ], ...)
-  } else {
-    for (i in 1:Ntree)
-      plot(x[[i]], y.lim = lim[i, ], direction = "u", ...)
-  }
-  axisPhylo(if (horiz) 1 else 4) # better if the deepest tree is last ;)
+  Limit
 }
