@@ -69,4 +69,4 @@ speed_df = tibble::tibble(
     axis.ticks = element_blank()
   )
 .ps
-ggsave("bicycle-speed.png", .ps, width = 7, height = 4)
+ggsave("bicycle-speed.png", .ps, width = 5, height = 4)
