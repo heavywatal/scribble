@@ -7,34 +7,13 @@ refresh('tumopp/r')
   N = c('256', '512')
 )
 .const = c('-D2', '-Chex', '-Lconst', '-Pmindrag')
+.const = c('-D2', '-Chex', '-Lstep', '-Pmindrag')
 
 argslist = make_args(.alt, .const, 3L)
 print(names(argslist))
 (label = paste(c('tumopp', .const, '-alt_', names(.alt)), collapse=''))
 
 results = argslist %>% wtl::map_par_dfr(tumopp, .id='args')
-# saveRDS(results, paste0(label, '.rds'))
-results$shape
-.plt = results %>%
-  dplyr::mutate(
-    repl = seq_along(population),
-    plt = purrr::map(population, ~{
-      filter_extant(.x) %>%
-      wtl::center_range(x, y) %>%
-      plot_lattice2d(alpha=1, size=1.2)+
-      scale_colour_grey(start = 0.1, end = 0.7, guide = FALSE)+
-      ggplot2::theme_void()
-    })
-  )
-.plt$plt[[1]]
-
-.plt %>% purrr::pmap(function(max, shape, repl, plt, ...) {
-  .outfile = sprintf("~/Desktop/tumopp2d_N%d_k%d_%02d.png", max, shape, repl)
-  message(.outfile)
-  ggsave(.outfile, plt, width=1, height=1, scale=7, dpi=200)
-})
-
-.xmax = results$population %>% purrr::map_int(~{max(.x$age)})
 
 .plot_genealogy = function(.tbl, xmax=max(.tbl$ageend)) {
   ggplot2::ggplot(.tbl) +
@@ -49,6 +28,7 @@ results$shape
     ggplot2::coord_cartesian(xlim = c(0, xmax), expand = FALSE)
 }
 
+.xmax = results$population %>% purrr::map_int(~{max(.x$age)})
 .pltgen = results %>%
   dplyr::mutate(plt = purrr::map(population, ~{
     layout_genealogy(.x) %>%
@@ -60,92 +40,77 @@ results$shape
 .pltgen %>%
   dplyr::mutate(repl = seq_along(population)) %>%
   purrr::pwalk(function(max, shape, repl, plt, ...) {
-    .outfile = sprintf("~/Desktop/genealogy_N%d_k%d_%02d.png", max, shape, repl)
+    .outfile = sprintf("genealogy_N%d_k%d_%02d.png", max, shape, repl)
     message(.outfile)
     ggsave(.outfile, plt, width=1, height=1, scale=4, dpi=300)
   })
 
+# #######1#########2#########3#########4#########5#########6#########7#########
+if (FALSE) {
 
+.plt = results %>%
+  dplyr::mutate(
+    repl = seq_along(population),
+    plt = purrr::map(population, ~{
+      filter_extant(.x) %>%
+      wtl::center_range(x, y) %>%
+      plot_lattice2d(alpha=1, size=1.2)+
+      scale_colour_grey(start = 0.1, end = 0.7, guide = FALSE)+
+      ggplot2::theme_void()
+    })
+  )
+.plt$plt[[1]]
+
+.plt %>% purrr::pmap(function(max, shape, repl, plt, ...) {
+  .outfile = sprintf("tumopp2d_N%d_k%d_%02d.png", max, shape, repl)
+  message(.outfile)
+  ggsave(.outfile, plt, width=1, height=1, scale=7, dpi=200)
+})
+
+}
 # #######1#########2#########3#########4#########5#########6#########7#########
 
-.tidy = tidyr::crossing(
-    sample = paste0("Sample ", seq_len(3L)),
-    lineage = seq_len(4L)
-  ) %>%
-  dplyr::mutate(value = runif(nrow(.))) %>%
+genes = c('TP53', 'CTNNB1', 'ARID1A', 'AXIN1', 'ARID2', 'KMT2D', 'BAP1', 'FAT4', 'RB1', 'PIK3CA', 'KMT2C')
+
+.trbl = tibble::tribble(
+  ~'サンプル 1', ~'サンプル 2', ~'サンプル 3',
+  1, 1, 1,
+  1, 1, 1,
+  1, 1, 1,
+  1, 1, 0,
+  1, 1, 0,
+  1, 0, 0,
+  0, 0, 1,
+  0, 0, 1
+) %>%
+  dplyr::mutate(gene = head(genes, nrow(.))) %>%
   print()
 
-.p_belt = ggplot(.tidy, aes(sample, value)) +
-  geom_col(aes(fill = lineage), position = "fill") +
-  scale_fill_gradient(guide = FALSE, low = '#333333', high = '#bbbbbb') +
-  coord_flip(expand = FALSE) +
-  theme_bw() +
-  theme(
-    panel.grid = element_blank(),
-    panel.border = element_blank(),
-    axis.title = element_blank(), axis.ticks = element_blank(),
-    axis.text.x = element_blank()
-  )
-.p_belt
-ggsave('~/Desktop/belt.pdf', .p_belt, width = 4, height =2)
-
-# #######1#########2#########3#########4#########5#########6#########7#########
-
-.tidy = tidyr::crossing(
-    sample = paste0("Sample ", seq_len(3L)),
-    gene = head(LETTERS, 8L)
+.tidy = .trbl %>%
+  tidyr::gather(sample, frequency, -gene) %>%
+  dplyr::mutate(frequency = ifelse(frequency > 0,
+    runif(length(frequency), 0.5, 0.9),
+    runif(length(frequency), 0, 0.3))
   ) %>%
-  dplyr::mutate(frequency = runif(nrow(.))) %>%
+  dplyr::mutate(frequency = ifelse(gene %in% head(genes, 3L), 1, frequency)) %>%
   print()
 
 .p = .tidy %>%
   ggplot(aes(gene, sample)) +
-  geom_raster(aes(fill = frequency)) +
+  geom_tile(aes(fill = frequency), width = 0.94, height = 0.94) +
   coord_fixed(expand = FALSE) +
+  scale_x_discrete(limits = .trbl$gene) +
   scale_y_discrete(limits = rev(unique(.tidy$sample)))+
-  scale_fill_gradient(
-    low='#eeeeee', high = '#000000', limits = c(0, 1),
-    name = "Frequency of malignant allele",
-    guide = guide_colourbar(label = FALSE)
-  ) +
-  labs(x = "Site") +
-  theme_bw(base_size = 14) +
+  scale_fill_gradient(guide = FALSE,
+    low='#eeeeee', high = '#000000', limits = c(0, 1)) +
+  labs(title = "変異型頻度") +
+  theme_bw(base_size = 14, base_family = "HiraKakuProN-W3") +
   theme(
-    axis.ticks = element_blank(),
-    axis.title.y = element_blank(),
-    legend.position = "top"
+    axis.ticks = element_blank(), axis.title = element_blank(),
+    axis.text.x = element_text(angle = -90, hjust=0, colour='black'),
+    axis.text.y = element_text(colour='black'),
+    panel.border = element_blank(), panel.grid = element_blank()
   )
 .p
-ggsave("sample-allele-freq.png", .p, width = 5, height = 3)
 
-
-
-# #######1#########2#########3#########4#########5#########6#########7#########
-
-genes = c('TP53', 'APC', 'TERT', 'RB1')
-n = 4L
-.table = tibble(
-  gene = paste0('sample-', seq_len(n)),
-  lineage_1 = runif(n),
-  lineage_2 = runif(n),
-  lineage_3 = runif(n)
-) %>% print()
-
-.tidy = .table %>%
-  tidyr::gather(sample, value, -gene) %>%
-  dplyr::mutate(sample = str_replace(sample, '_', '-')) %>%
-  print()
-
-ggplot(.tidy, aes(sample, gene))+
-  geom_tile(aes(fill = value))+
-  geom_text(aes(label = sprintf('%.2f', value)))+
-  scale_fill_gradient(low="#ffffff", high='#888888', limits=c(0, 1), guide=FALSE)+
-  scale_x_discrete(position = 'top')+
-  scale_y_discrete(limits = rev(.table$gene))+
-  coord_cartesian(expand = FALSE)+
-  theme_bw()+
-  theme(
-    axis.title=element_blank(),
-    axis.ticks=element_blank(),
-    panel.grid = element_blank()
-  )
+ggsave("sample-allele-freq.png", .p, width = 4, height = 2.5)
