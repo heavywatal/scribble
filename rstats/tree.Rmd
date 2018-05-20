@@ -8,7 +8,7 @@ output:
     self_contained: true
     theme: null
     highlight: null
-    mathjax: https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/MathJax.js?config=TeX-AMS_CHTML
+    mathjax: https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML
 ---
 
 ## Make distance matrix from aligned sequences
@@ -47,9 +47,10 @@ plot.phylo(.phylo, type='unrooted')
 
 ## Manipulation and visualization of trees
 
-### network, sna, ggnet
+### statnet (network, sna), ggnet
 
-- [network](https://cran.r-project.org/web/packages/network/)
+- [statnet](https://github.com/statnet)
+- [network](https://github.com/statnet/network)
 - [sna](https://cran.r-project.org/web/packages/sna/)
 - [ggnet](https://github.com/briatte/ggnet)
 - [ggnetwork](https://github.com/briatte/ggnetwork)
@@ -62,6 +63,8 @@ plot.phylo(.phylo, type='unrooted')
 同じ作者からいくつもパッケージが出ていて関係性が見えにくい。
 [GGally](https://github.com/ggobi/ggally)
 に含まれるggnet2を使うのがよさそう？
+
+igraphに比べるとドキュメントが貧弱でツラい。
 
 ```{r network}
 library(network)
@@ -103,6 +106,25 @@ geom_node_point(size=8, colour='dodgerblue')+
 geom_node_text(aes(label = name))+
 theme_bw()
 ```
+
+- `as_bipartite`
+- `as_star`
+- `as_tree`
+- `in_circle`
+- `nicely`
+- `on_grid`
+- `on_sphere`
+- `randomly`
+- `with_dh`
+- `with_drl`
+- `with_fr`
+- `with_gem`
+- `with_graphopt`
+- `with_kk`
+- `with_lgl`
+- `with_mds`
+- `with_sugiyama`
+
 
 ### tidytree
 
