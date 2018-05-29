@@ -4,11 +4,11 @@ author: "WMI"
 date: "January 18, 2017"
 output:
   html_document:
-    css: "~/.R/rmd.css"
     self_contained: true
     theme: null
     highlight: null
-    mathjax: https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_CHTML
+    css: "~/.R/rmd.css"
+    mathjax: https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML
 ---
 
 https://rmarkdown.rstudio.com/html_document_format.html
