@@ -61,7 +61,7 @@ def main():
 
     fun = arg_makers[args.function]
     it = iter_args(fun, rest, args.repeat, args.skip)
-    wopt.map_async(it, args.jobs, args.dry_run)
+    wopt.map_async(it, args.jobs, args.dry_run, outdir=args.outdir)
     print('End of ' + __file__)
 
 
