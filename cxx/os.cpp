@@ -5,6 +5,7 @@
 #include <cerrno>
 #include <cstdio> // remove
 #include <cstdlib> // getenv
+#include <cstring> // strcmp
 
 #include <string>
 #include <fstream>
