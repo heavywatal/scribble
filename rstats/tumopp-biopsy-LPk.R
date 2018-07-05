@@ -15,12 +15,7 @@ results = raw_results %>%
   dplyr::group_by(local, path, shape) %>%
   dplyr::mutate(replicate = dplyr::row_number()) %>%
   dplyr::ungroup() %>%
-  dplyr::mutate(
-    local = factor(.tr_L[local], levels=.tr_L),
-    path = factor(.tr_P[path], levels=.tr_P),
-    extant = purrr::map(population, filter_extant),
-    graph = purrr::map(population, make_igraph),
-  ) %>%
+  dplyr::mutate(extant = purrr::map(population, filter_extant)) %>%
   print()
 
 .population = results$population[[1]]
@@ -43,6 +38,7 @@ df_extant = df_sampled %>%
     })
   ) %>%
   tidyr::unnest() %>%
+  dplyr::ungroup() %>%
   print()
 
 .p_sampled = df_extant %>%
@@ -185,9 +181,18 @@ df_capture_tidy = df_capture %>%
   print()
 
 .p_capture = df_capture_tidy %>%
-  plot_capture_rate() +
+  plot_capture_rate(point = FALSE, errorbar = FALSE) +
   facet_grid(local + path ~ shape + replicate) +
   scale_y_continuous(breaks = c(0, 0.5, 1,0)) +
   theme(panel.grid = element_blank())
 .p_capture
 ggsave("capture_rate-6.png", .p_capture, width=11, height=12)
+
+
+.p_natsume = df_capture_tidy %>%
+  dplyr::filter(local == "Constant-rate", path == "Push-3", shape == 1L, replicate == 2L) %>%
+  plot_capture_rate(point = FALSE, errorbar = FALSE) +
+  scale_y_continuous(breaks = c(0, 0.5, 1)) +
+  labs(x = "Number of samples", y = "Captured variations")
+.p_natsume
+ggsave("capture-rate-6.png", .p_natsume, width=4, height=4)

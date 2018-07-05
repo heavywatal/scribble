@@ -12,17 +12,18 @@ print(names(argslist))
 
 raw_results = argslist %>% purrr::map_dfr(tumopp, .id='args')
 
-# results = raw_results %>%
-results = fixed_results %>%
+# #######1#########2#########3#########4#########5#########6#########7#########
+
+result_dirs = fs::dir_ls(type = "directory")
+raw_results = tumopp::read_results(result_dirs) %>% print()
+
+results = raw_results %>%
   dplyr::select_if(~ n_distinct(.x) > 1L) %>%
   dplyr::select(-outdir, -seed, -drivers) %>%
   dplyr::group_by(delta0, rho0) %>%
   dplyr::mutate(replicate = dplyr::row_number()) %>%
   dplyr::ungroup() %>%
-  dplyr::mutate(
-    extant = purrr::map(population, filter_extant),
-    graph = purrr::map(population, make_igraph),
-  ) %>%
+  dplyr::mutate(extant = purrr::map(population, filter_extant)) %>%
   print()
 
 .population = results$population[[1]]
@@ -56,13 +57,6 @@ df_extant = df_sampled %>%
 .p_sampled
 ggsave('samples.png', .p_sampled, width = 12, height = 4)
 
-df_sampled$population[[.i]]
-
-df_sampled$extant[[.i]]
-df_sampled$regions[[.i]]$id %>% purrr::map(unique)
-
-.i = 3L
-within_between_samples(df_sampled$subgraph[[.i]], df_sampled$regions[[.i]])
 
 df_distance = df_sampled %>%
   dplyr::mutate(distance = purrr::map2(subgraph, regions, within_between_samples)) %>%
