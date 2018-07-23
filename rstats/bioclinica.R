@@ -1,6 +1,6 @@
 library(tidyverse)
 library(tumopp)
-refresh('tumopp/r')
+refresh('rtumopp')
 
 .alt = list(
   k = c('1', '1e6'),
@@ -25,7 +25,7 @@ results = argslist %>% wtl::map_par_dfr(tumopp, .id='args')
       ggplot2::aes_(x = ~ageend, y = ~posend, colour = ~clade),
       size = 0.9, alpha = 0.7
     ) +
-    ggplot2::coord_cartesian(xlim = c(0, xmax), expand = FALSE)
+    ggplot2::coord_cartesian(xlim = c(0, xmax))
 }
 
 .xmax = results$population %>% purrr::map_int(~{max(.x$age)})
@@ -33,7 +33,8 @@ results = argslist %>% wtl::map_par_dfr(tumopp, .id='args')
   dplyr::mutate(plt = purrr::map(population, ~{
     layout_genealogy(.x) %>%
     .plot_genealogy(xmax=.xmax) +
-    scale_colour_grey(start = 0.1, end = 0.7, guide = FALSE, na.value="#333333")+
+    # scale_colour_grey(start = 0.1, end = 0.7, guide = FALSE, na.value="#333333")+
+    scale_color_brewer(palette = "Spectral", guide = FALSE, na.value = "#333333") +
     theme_void()
   }))
 .pltgen$plt[[1L]]
