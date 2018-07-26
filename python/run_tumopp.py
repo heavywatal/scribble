@@ -1,10 +1,39 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
+"""https://heavywatal.github.io/tumopp/
 """
 import itertools
+import random
 import wtl.options as wopt
-enumerator = itertools.count(1)
+
+
+def generate(params):
+    d = wopt.OrderedDict()
+    for key, gen in params.items():
+        d[key] = gen()
+    return d
+
+
+def has_invalid_combination(d):
+    return ((d['L'] in ('step', 'linear')) and
+            (d['P'] not in ('random', 'mindrag')))
+
+
+def prior():
+    const = ['-N50000', '-D3', '-Chex', '-k100']
+    params = wopt.OrderedDict()
+    params['L'] = lambda: random.choice(['const', 'step', 'linear'])
+    params['P'] = lambda: random.choice(['random', 'roulette', 'mindrag'])
+    params['d'] = lambda: random.uniform(0.0, 0.5)
+    params['m'] = lambda: random.uniform(0.0, 10.0)
+    params['p'] = lambda: random.uniform(0.0, 1.0)
+    params['r'] = lambda: random.randint(1, 20)
+    while True:
+        while True:
+            d = generate(params)
+            if not has_invalid_combination(d):
+                break
+        yield (d, const)
 
 
 def stem():
@@ -42,7 +71,11 @@ def spatial():
 def iter_args(arg_maker, rest, repeat, skip):
     const = ['tumopp'] + rest
     now = wopt.now()
-    for i, v in enumerate(wopt.cycle(arg_maker(), repeat)):
+    if arg_maker == prior:
+        it = itertools.islice(arg_maker(), repeat)
+    else:
+        it = wopt.cycle(arg_maker(), repeat)
+    for i, v in enumerate(it):
         if i < skip:
             continue
         args = wopt.make_args(v[0])
