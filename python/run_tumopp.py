@@ -24,10 +24,10 @@ def prior():
     params = wopt.OrderedDict()
     params['L'] = lambda: random.choice(['const', 'step', 'linear'])
     params['P'] = lambda: random.choice(['random', 'roulette', 'mindrag'])
-    params['d'] = lambda: random.uniform(0.0, 0.5)
+    params['d'] = lambda: random.uniform(0.0, 0.3)
     params['m'] = lambda: random.uniform(0.0, 10.0)
-    params['p'] = lambda: random.uniform(0.0, 1.0)
-    params['r'] = lambda: random.randint(1, 20)
+    params['p'] = lambda: random.uniform(0.1, 1.0)
+    params['r'] = lambda: random.randint(2, 20)
     while True:
         while True:
             d = generate(params)
