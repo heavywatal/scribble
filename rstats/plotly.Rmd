@@ -1,0 +1,21 @@
+---
+title: "plotly"
+output: html_vignette
+---
+
+```{r library, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(plotly)
+```
+
+```{r plotly}
+plot_ly(iris, x=~Sepal.Length, y=~Sepal.Width, mode='markers')
+```
+
+```{r ggplot}
+p = ggplot(iris, aes(Sepal.Length, Sepal.Width)) +
+  geom_point(aes(colour = Species)) +
+  scale_colour_brewer(palette = "Spectral") +
+  theme_bw()
+ggplotly(p)
+```
