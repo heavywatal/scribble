@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <cstddef>
 #include <bitset>
 #include <vector>
 #include <deque>
@@ -10,6 +11,7 @@ inline void primitive() {
     std::cout << "sizeof(primitive) ----------------\n";
     std::cout << "char          " << sizeof(char) << "\n";
     std::cout << "bool          " << sizeof(bool) << "\n";
+    std::cout << "short         " << sizeof(short) << "\n";
     std::cout << "int           " << sizeof(int) << "\n";
     std::cout << "long          " << sizeof(long) << "\n";
     std::cout << "long long     " << sizeof(long long) << "\n";
@@ -19,6 +21,9 @@ inline void primitive() {
     std::cout << "uint_fast16_t " << sizeof(uint_fast16_t) << "\n";
     std::cout << "uint_fast32_t " << sizeof(uint_fast32_t) << "\n";
     std::cout << "uint_fast64_t " << sizeof(uint_fast64_t) << "\n";
+    std::cout << "intmax_t      " << sizeof(intmax_t) << "\n";
+    std::cout << "intptr_t      " << sizeof(intptr_t) << "\n";
+    std::cout << "ptrdiff_t     " << sizeof(ptrdiff_t) << "\n";
     std::cout << "size_t        " << sizeof(size_t) << "\n";
 }
 
