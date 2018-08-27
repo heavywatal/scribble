@@ -9,10 +9,11 @@ library(tumopp)
   print()
 
 .mean_fst = function(population, graph, ...) {
+  extant = tumopp::filter_extant(population)
+  if (nrow(extant) < 50000L) return(NA_real_)
   nsam = sample(c(5L, 6L, 6L), 1L)
   ncell = 100L
-  regions = population %>%
-    tumopp::filter_extant() %>%
+  regions = extant %>%
     tumopp::sample_uniform_regions(nsam = nsam, ncell = ncell)
   sampled = purrr::flatten_int(regions$id)
   subgraph = tumopp::subtree(graph, sampled)
@@ -25,7 +26,6 @@ df_fst = .base %>%
   dplyr::mutate(fst = parallel::mclapply(directory, function(indir) {
     message(indir)
     population = file.path(indir, "population.tsv.gz") %>% tumopp:::read_tumopp()
-    if (nrow(filter_extant(population)) < 50000L) return(NA_real_)
     .mean_fst(population, tumopp::make_igraph(population))
   }) %>% purrr::flatten_dbl()) %>%
   print()

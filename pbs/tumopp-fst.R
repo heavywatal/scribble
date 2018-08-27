@@ -20,10 +20,10 @@ library(wtl)
 library(magrittr)
 
 .mean_fst = function(population, graph, ...) {
-  nsam = sample(c(5L, 6L, 6L), 1L)
-  ncell = 100L
   extant = tumopp::filter_extant(population)
   if (nrow(extant) < 50000L) return(NA_real_)
+  nsam = sample(c(5L, 6L, 6L), 1L)
+  ncell = 100L
   regions = extant %>%
     tumopp::sample_uniform_regions(nsam = nsam, ncell = ncell)
   sampled = purrr::flatten_int(regions$id)
