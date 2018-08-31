@@ -4,7 +4,9 @@
 #include <vector>
 #include <deque>
 #include <valarray>
+#include <array>
 #include <set>
+#include <memory>
 #include <iostream>
 
 inline void primitive() {
@@ -29,14 +31,16 @@ inline void primitive() {
 
 inline void container() {
     std::cout << "sizeof(container) ----------------\n";
-    std::vector<int> vi;
+    std::vector<int> vi(7);
     std::cout << "vector<int>     " << sizeof(vi) << " + data\n";
-    std::vector<long> vl;
+    std::vector<long> vl(7);
     std::cout << "vector<long>    " << sizeof(vl) << " + data\n";
-    std::deque<int> di;
+    std::deque<int> di(7);
     std::cout << "deque<int>      " << sizeof(di) << " + data\n";
-    std::valarray<int> vai;
+    std::valarray<int> vai(0, 7);
     std::cout << "valarray<int>   " << sizeof(vai) << " + data\n";
+    std::array<int, 7> ai3;
+    std::cout << "array<int, 7>   " << sizeof(ai3) << "\n";
     std::set<int> si;
     std::cout << "set<int>        " << sizeof(si) << " + data\n";
     std::pair<int, int> pii;
@@ -51,6 +55,10 @@ inline void container() {
     std::cout << "bitset<65>      " << sizeof(bs65) << "\n";
     std::bitset<129> bs129;
     std::cout << "bitset<129>     " << sizeof(bs129) << "\n";
+    auto shptr = std::make_shared<int>(42);
+    std::cout << "shared_ptr<int> " << sizeof(shptr) << "\n";
+    auto unptr = std::make_unique<int>(42);
+    std::cout << "unique_ptr<int> " << sizeof(unptr) << "\n";
 }
 
 int main() {
