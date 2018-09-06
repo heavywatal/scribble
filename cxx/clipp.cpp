@@ -9,17 +9,20 @@ struct nonempty {
   bool operator()(const std::string& s) {return !s.empty();}
 };
 
-template <class T, typename std::enable_if<std::is_integral<T>{}, std::nullptr_t>::type=nullptr>
+template <bool Condition>
+using enable_if_t = typename std::enable_if<Condition, std::nullptr_t>::type;
+
+template <class T, enable_if_t<std::is_integral<T>{}> = nullptr>
 inline auto filter_type(T) {
   return clipp::match::integers{};
 }
 
-template <class T, typename std::enable_if<std::is_floating_point<T>{}, std::nullptr_t>::type=nullptr>
+template <class T, enable_if_t<std::is_floating_point<T>{}> = nullptr>
 inline auto filter_type(T) {
   return clipp::match::numbers{};
 }
 
-template <class T, typename std::enable_if<!std::is_trivial<T>{}, std::nullptr_t>::type=nullptr>
+template <class T, enable_if_t<!std::is_trivial<T>{}> = nullptr>
 inline auto filter_type(T) {
   return nonempty{};
 }
