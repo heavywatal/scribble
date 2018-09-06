@@ -1,28 +1,37 @@
 #include <clipp.h>
 
+#include <vector>
+#include <string>
 #include <iostream>
+
+struct nonempty {
+  bool operator()(const std::string& s) {return !s.empty();}
+};
+
+template <class T, class Filter=nonempty> inline clipp::group
+doc_default(clipp::parameter&& option, const std::string& label, T& x, const std::string& doc, Filter&& filter=Filter{}) {
+  std::ostringstream oss;
+  oss << doc << " (" << x << ")";
+  return (option & clipp::value(std::forward<Filter>(filter), label, x)) % oss.str();
+}
 
 class Individual {
   public:
     static clipp::group parameter_group() {
         return clipp::with_prefixes_short_long("-", "--",
-          (clipp::option("d", "death") & clipp::number("num", DEATH_RATE_))
-            % "Death rate",
-          (clipp::option("u", "mutation") & clipp::number("num", MUTATION_RATE_))
-            % "Mutation rate"
+          doc_default(clipp::option("d", "death"), "num", DEATH_RATE_, "Death rate", clipp::match::numbers{}),
+          doc_default(clipp::option("l", "genome"), "int", GENOME_SIZE_, "Genome size", clipp::match::integers{}),
+          doc_default(clipp::option("m", "mode"), "str", MODE_, "Mode")
         );
     }
-    static double DEATH_RATE() {return DEATH_RATE_;}
-    static double MUTATION_RATE() {return MUTATION_RATE_;}
-
-  private:
     static double DEATH_RATE_;
-    static double MUTATION_RATE_;
+    static unsigned GENOME_SIZE_;
+    static std::string MODE_;
 };
 
-double Individual::MUTATION_RATE_ = 0.1;
 double Individual::DEATH_RATE_ = 0.1;
-
+unsigned Individual::GENOME_SIZE_ = 42;
+std::string Individual::MODE_ = "normal";
 
 int main(int argc, char* argv[]) {
     const auto program = argv[0];
@@ -43,7 +52,7 @@ int main(int argc, char* argv[]) {
     auto parsed = clipp::parse(arguments, cli);
 
     auto fmt = clipp::doc_formatting{}
-        .start_column(2)
+        .first_column(2)
         .doc_column(24);
 
     if (!parsed) {
@@ -56,7 +65,7 @@ int main(int argc, char* argv[]) {
         std::cout << clipp::make_man_page(cli, program, fmt);
         return 0;
       case mode_t::version:
-        std::cout << "clipp 1.1.0\n";
+        std::cout << "clipp 1.2.0\n";
         return 0;
       default:
         break;
@@ -68,6 +77,7 @@ int main(int argc, char* argv[]) {
         if (m.conflict()) std::cout << " conflict";
         std::cout << '\n';
     }
-    std::cout << "Individual::DEATH_RATE_: " << Individual::DEATH_RATE() << "\n";
-    std::cout << "Individual::MUTATION_RATE_: " << Individual::MUTATION_RATE() << "\n";
+    std::cout << "Individual::DEATH_RATE_: " << Individual::DEATH_RATE_ << "\n";
+    std::cout << "Individual::GENOME_SIZE_: " << Individual::GENOME_SIZE_ << "\n";
+    std::cout << "Individual::MODE_: " << Individual::MODE_ << "\n";
 }
