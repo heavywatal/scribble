@@ -1,5 +1,6 @@
 #include <clipp.h>
 
+#include <type_traits>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -8,20 +9,40 @@ struct nonempty {
   bool operator()(const std::string& s) {return !s.empty();}
 };
 
-template <class T, class Filter=nonempty> inline clipp::group
-doc_default(clipp::parameter&& option, const std::string& label, T& x, const std::string& doc, Filter&& filter=Filter{}) {
+template <class T, typename std::enable_if<std::is_integral<T>{}, std::nullptr_t>::type=nullptr>
+inline auto filter_type(T) {
+  return clipp::match::integers{};
+}
+
+template <class T, typename std::enable_if<std::is_floating_point<T>{}, std::nullptr_t>::type=nullptr>
+inline auto filter_type(T) {
+  return clipp::match::numbers{};
+}
+
+template <class T, typename std::enable_if<!std::is_trivial<T>{}, std::nullptr_t>::type=nullptr>
+inline auto filter_type(T) {
+  return nonempty{};
+}
+
+template <class T> inline
+std::string doc_default(const T& x, const std::string& doc) {
   std::ostringstream oss;
-  oss << doc << " (" << x << ")";
-  return (option & clipp::value(std::forward<Filter>(filter), label, x)) % oss.str();
+  oss << doc << " (=" << x << ")";
+  return oss.str();
+}
+
+template <class T> inline clipp::group
+clipp_group(clipp::parameter&& option, T& x, const std::string& doc="", const std::string& label="arg") {
+    return (option & clipp::value(filter_type(x), label, x)).doc(doc_default(x, doc));
 }
 
 class Individual {
   public:
     static clipp::group parameter_group() {
         return clipp::with_prefixes_short_long("-", "--",
-          doc_default(clipp::option("d", "death"), "num", DEATH_RATE_, "Death rate", clipp::match::numbers{}),
-          doc_default(clipp::option("l", "genome"), "int", GENOME_SIZE_, "Genome size", clipp::match::integers{}),
-          doc_default(clipp::option("m", "mode"), "str", MODE_, "Mode")
+          clipp_group(clipp::option("d", "death"), DEATH_RATE_, "Death rate"),
+          clipp_group(clipp::option("l", "genome"), GENOME_SIZE_, "Genome size"),
+          clipp_group(clipp::option("m", "mode"), MODE_)
         );
     }
     static double DEATH_RATE_;
