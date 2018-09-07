@@ -1,4 +1,5 @@
 #include <clipp.h>
+#include <nlohmann/json.hpp>
 
 #include <type_traits>
 #include <vector>
@@ -27,6 +28,11 @@ inline auto filter_type(T) {
   return nonempty{};
 }
 
+template <class T, enable_if_t<std::is_pointer<T>{}> = nullptr>
+inline auto filter_type(T) {
+  return nonempty{};
+}
+
 template <class T> inline
 std::string doc_default(const T& x, const std::string& doc) {
   std::ostringstream oss;
@@ -39,13 +45,42 @@ clipp_group(clipp::parameter&& option, T& x, const std::string& doc="", const st
     return (option & clipp::value(filter_type(x), label, x)).doc(doc_default(x, doc));
 }
 
+template <typename T> inline
+auto set(nlohmann::json& obj, const char* key) {
+    return [&j = obj[key]](const char* s){j = s;};
+}
+
+template <> inline
+auto set<double>(nlohmann::json& obj, const char* key) {
+    return [&j = obj[key]](const char* s){j = std::stod(s);};
+}
+
+template <> inline
+auto set<int>(nlohmann::json& obj, const char* key) {
+    return [&j = obj[key]](const char* s){j = std::stoi(s);};
+}
+
+template <> inline
+auto set<unsigned long>(nlohmann::json& obj, const char* key) {
+    return [&j = obj[key]](const char* s){j = std::stoul(s);};
+}
+
+template <class T> inline clipp::group
+clipp_group(nlohmann::json& obj, std::vector<std::string>&& flags, const T init=T{}, const std::string& doc="", const std::string& label="arg") {
+    const char* key = flags.back().c_str();
+    obj[key] = init;
+    return (clipp::option(flags)
+            & clipp::value(filter_type(init), label).call(set<T>(obj, key))
+           ).doc(doc_default(obj[key], doc));
+}
+
 class Individual {
   public:
-    static clipp::group parameter_group() {
+    static clipp::group parameter_group(nlohmann::json& vm) {
         return clipp::with_prefixes_short_long("-", "--",
-          clipp_group(clipp::option("d", "death"), DEATH_RATE_, "Death rate"),
-          clipp_group(clipp::option("l", "genome"), GENOME_SIZE_, "Genome size"),
-          clipp_group(clipp::option("m", "mode"), MODE_)
+          clipp_group(vm, {"d", "death"}, DEATH_RATE_, "Death rate"),
+          clipp_group(vm, {"l", "genome"}, GENOME_SIZE_, "Genome size"),
+          clipp_group(vm, {"m", "mode"}, MODE_)
         );
     }
     static double DEATH_RATE_;
@@ -63,15 +98,17 @@ int main(int argc, char* argv[]) {
 
     enum class mode_t {run, help, version};
     mode_t mode = mode_t::run;
+    nlohmann::json vm;
 
     clipp::group general_options = clipp::with_prefixes_short_long("-", "--",
       clipp::option("h", "help").set(mode, mode_t::help).doc("Print help"),
       clipp::option("version").set(mode, mode_t::version).doc("Print version"),
+      clipp_group(vm, {"p", "pi"}, 3.1415, "Mathematical constant"),
       clipp::option("v", "verbose")
     );
     auto cli = (
       general_options,
-      Individual::parameter_group()
+      Individual::parameter_group(vm)
     );
     auto parsed = clipp::parse(arguments, cli);
 
@@ -101,7 +138,5 @@ int main(int argc, char* argv[]) {
         if (m.conflict()) std::cout << " conflict";
         std::cout << '\n';
     }
-    std::cout << "Individual::DEATH_RATE_: " << Individual::DEATH_RATE_ << "\n";
-    std::cout << "Individual::GENOME_SIZE_: " << Individual::GENOME_SIZE_ << "\n";
-    std::cout << "Individual::MODE_: " << Individual::MODE_ << "\n";
+    std::cout << vm.dump(2) << "\n";
 }
