@@ -19,6 +19,19 @@ def has_invalid_combination(d):
             (d['P'] not in ('random', 'mindrag')))
 
 
+def size():
+    const = ['-D3', '-Chex']
+    params = wopt.OrderedDict()
+    params['N'] = ['5000', '10000', '20000', '40000']
+    params['L'] = ['const', 'linear']
+    params['P'] = ['random', 'mindrag']
+    params['k'] = ['1', '1e6']
+    params['d'] = ['0.0', '0.2']
+    params['m'] = ['0.0', '2.0']
+    for d in wopt.product(params):
+        yield (d, const)
+
+
 def prior():
     const = ['-N50000', '-D3', '-Chex', '-k100']
     params = wopt.OrderedDict()
