@@ -1,11 +1,8 @@
 #!/bin/sh
-#PBS -N envvars
+#PBS -N envvars.sh
 #PBS -j oe
 #PBS -l select=1:ncpus=1:mem=1gb
-pwd
-cd $PBS_O_WORKDIR
-pwd
-echo "Hello, world!"
+echo "pwd: $(pwd)"
 echo "PBS_DEFAULT: $PBS_DEFAULT"
 echo "PBS_DPREFIX: $PBS_DPREFIX"
 echo "PBS_ENVIRONMENT: $PBS_ENVIRONMENT"
@@ -27,5 +24,3 @@ echo "PBS_O_WORKDIR: $PBS_O_WORKDIR"
 echo "PBS_QUEUE: $PBS_QUEUE"
 echo "PBS_TMPDIR: $PBS_TMPDIR"
 echo "TMPDIR: $TMPDIR"
-echo "pwd: $(pwd)"
-sleep 30
