@@ -21,7 +21,6 @@ library(magrittr)
 
 .mean_fst = function(population, graph, ncell) {
   extant = tumopp::filter_extant(population)
-  if (nrow(extant) < 50000L) return(NA_real_)
   nsam = sample(c(5L, 6L, 6L), 1L)
   regions = extant %>%
     tumopp::sample_uniform_regions(nsam = nsam, ncell = ncell)
@@ -36,27 +35,34 @@ library(magrittr)
     purrr::map2(sprintf(paste0("-o", o), i), c)
   result = tumopp(.cmd)
   if (NROW(result) < 1L) return(NA_real_)
-  .fst = .mean_fst(result$population[[1L]], result$graph[[1L]], ncell=100L)
-  if (!is.na(.fst) && lbound < .fst && .fst < ubound) {
-    write_results(result)
-  }
-  .fst
+  ncell_fst = tibble::tibble(.ncell) %>%
+    dplyr::mutate(fst = purrr::map_dbl(
+      .data$ncell, .mean_fst,
+      population = result$population[[1L]],
+      graph = result$graph[[1L]]
+    ))
+  result %>%
+    dplyr::select(-population, -graph) %>%
+    dplyr::mutate(fst = list(ncell_fst)) %>%
+    tidyr::unnest()
 }
 
-.obs_mean = 0.2383436
-.tolerance = 0.3
-lbound = .obs_mean * (1 - .tolerance)
-ubound = .obs_mean * (1 + .tolerance)
-
-.const = c('-N50000', '-D3', '-Chex', '-k100')
+.ncell = c(50L, 100L, 200L, 400L)
+.const = c('-D3', '-Chex')
 .prior = list(
-  L = function(n = 1L) {sample(c('const', 'step', 'linear'), n, replace = TRUE)},
-  P = function(n = 1L) {sample(c('random', 'roulette', 'mindrag'), n, replace = TRUE)},
-  d = function(n = 1L) {runif(n, 0.0, 0.3)},
-  m = function(n = 1L) {runif(n, 0.0, 10.0)},
-  p = function(n = 1L) {runif(n, 0.2, 1.0)},
-  r = function(n = 1L) {wtl::runif.int(n, 2L, 20L)}
+  N = function(n = 1L) {round(2 ** runif(n, 15, 22))},
+  k = function(n = 1L) {round(10 ** runif(n, 0, 6))},
+  L = function(n = 1L) {sample(c('const', 'linear'), n, replace = TRUE)},
+  P = function(n = 1L) {sample(c('random', 'mindrag'), n, replace = TRUE)},
+  d = function(n = 1L) {runif(n, 0.0, 0.2)},
+  m = function(n = 1L) {runif(n, 0.0, 2.0)}
 )
 
 .fmt = format(Sys.time(), "%Y%m%d_%H%M%S_%%d")
-.devnull = parallel::mclapply(seq_len(1e6), .tumopp_fst, o = .fmt)
+
+df_fst = wtl::mcmap_dfr(seq_len(1e5), .tumopp_fst, o = .fmt) %>%
+  dplyr::select(-seed, -outdir) %>%
+  dplyr::select_if(~ n_distinct(.x) > 1L) %>%
+  print()
+
+readr::write_tsv(df_fst, "tumopp-fst-size.tsv.gz")
