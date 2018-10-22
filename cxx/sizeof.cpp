@@ -6,6 +6,7 @@
 #include <valarray>
 #include <array>
 #include <set>
+#include <tuple>
 #include <memory>
 #include <iostream>
 
@@ -49,6 +50,10 @@ inline void container() {
     std::cout << "pair<int,long>  " << sizeof(pil) << "\n";
     std::pair<long, long> pll;
     std::cout << "pair<long,long> " << sizeof(pll) << "\n";
+    std::tuple<int, int> tii;
+    std::cout << "tuple<int,int>  " << sizeof(tii) << "\n";
+    std::tuple<int, long> til;
+    std::cout << "tuple<int,long> " << sizeof(til) << "\n";
     std::bitset<1> bs1;
     std::cout << "bitset<1>       " << sizeof(bs1) << "\n";
     std::bitset<65> bs65;
