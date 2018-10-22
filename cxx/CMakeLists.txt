@@ -14,6 +14,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 add_compile_options(-march=native -Wall -Wextra -Wpedantic)
 
+set(CMAKE_MODULE_PATH "$ENV{HOME}/.cmake/packages")
+include(WarningFlagsCXX OPTIONAL)
+
 set(Boost_NO_BOOST_CMAKE ON)
 find_package(Boost COMPONENTS context)
 message("Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
