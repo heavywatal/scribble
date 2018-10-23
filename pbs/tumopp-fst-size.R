@@ -1,23 +1,7 @@
 #!/usr/bin/env Rscript
-#PBS -N tumopp-fst
-#PBS -j oe
-#PBS -l select=1:ncpus=24:mem=24gb
-options(mc.cores = 24L)
-sessionInfo()
-
-PBS_O_WORKDIR = Sys.getenv("PBS_O_WORKDIR")
-setwd(PBS_O_WORKDIR)
-print(getwd())
-
-print(.libPaths())
-message(".Library: ", .Library)
-message(".Library.site: ", .Library.site)
-
-# #######1#########2#########3#########4#########5#########6#########7#########
-
+library(tidyverse)
 library(tumopp)
 library(wtl)
-library(magrittr)
 
 .mean_fst = function(population, graph, ncell) {
   extant = tumopp::filter_extant(population)
@@ -35,7 +19,7 @@ library(magrittr)
     purrr::map2(sprintf(paste0("-o", o), i), c)
   result = tumopp(.cmd)
   if (NROW(result) < 1L) return(NA_real_)
-  ncell_fst = tibble::tibble(.ncell) %>%
+  ncell_fst = tibble::tibble(ncell = .ncell) %>%
     dplyr::mutate(fst = purrr::map_dbl(
       .data$ncell, .mean_fst,
       population = result$population[[1L]],
