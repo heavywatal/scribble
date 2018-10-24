@@ -16,7 +16,7 @@ plot_logo = function(circle_scale=1.0, padding=0) {
   .limits = c(-padding, 100 + padding)
   ggplot(.path, aes(x, y)) +
     geom_polygon(data = .poly, fill = "#e08010") +
-    geom_path(size = 6, linejoin = "mitre") +
+    geom_path(size = 6, linejoin = "bevel") +
     geom_point(size = 18 * circle_scale, data = .dot, colour = "#a4321a") +
     # geom_point(size = 21 * circle_scale, data = .dot, colour = "#a4321a") +
     coord_fixed(xlim = .limits, ylim = .limits, expand = FALSE) +
