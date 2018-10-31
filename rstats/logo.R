@@ -14,6 +14,7 @@ plot_logo = function(circle_scale=1.0, padding=0) {
   .dot = tibble(x = 77, y = 77)
   # .dot = tibble(x = 77, y = 83)
   .limits = c(-padding, 100 + padding)
+  circle_scale = circle_scale * 100 / (100 + 2 * padding)
   ggplot(.path, aes(x, y)) +
     geom_polygon(data = .poly, fill = "#e08010") +
     geom_path(size = 6, linejoin = "bevel") +
@@ -28,9 +29,9 @@ quartz(width = 4, height = 4)
 plot_logo()
 
 ggsave("heavywatal-white.png", plot_logo(), height = 4, width = 4, dpi = 300)
-ggsave("heavywatal-white-circle.png", plot_logo(padding=10), height = 4, width = 4, dpi = 300)
-ggsave("heavywatal-circle.png", plot_logo(padding=10), height = 4, width = 4, dpi = 300, bg = "transparent")
+ggsave("heavywatal-white-circle.png", plot_logo(padding=12), height = 4, width = 4, dpi = 300)
+ggsave("heavywatal-circle.png", plot_logo(padding=12), height = 4, width = 4, dpi = 300, bg = "transparent")
 ggsave("heavywatal.png", plot_logo(), height = 4, width = 4, dpi = 300, bg = "transparent")
-ggsave("heavywatal-circle.svg", plot_logo(0.75, padding=10), height = 4, width = 4, bg = "transparent")
+ggsave("heavywatal-circle.svg", plot_logo(0.75, padding=15), height = 4, width = 4, bg = "transparent")
 ggsave("heavywatal.svg", plot_logo(0.75), height = 4, width = 4, bg = "transparent")
 # svglite bug?
