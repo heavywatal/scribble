@@ -32,4 +32,12 @@ p = ggplot(df) +
   facet_grid(lib ~ .)
 print(p)
 ggsave("dist-sum-binomial.png", p, width = 6, height = 6)
+
+lib_mean(df)
+#          lib      sum
+#       <char>    <num>
+# 1:    libc++ 100001.6
+# 2: libstdc++ 100189.3
 ```
+
+![cxx/binomial/dist-sum-binomial.png](https://raw.githubusercontent.com/heavywatal/scribble/master/cxx/binomial/dist-sum-binomial.png)
