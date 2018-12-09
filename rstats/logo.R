@@ -63,3 +63,9 @@ phex = plot_logo(scale, 0.21) %>%
   coord_fixed(xlim = xlim, ylim = ylim)
 phex
 ggsave("hex-heavywatal.png", phex, height = scale, width = scale * sqrt(3) / 2, dpi = 300, bg = "transparent")
+
+phex = plot_logo(scale, 0.21, svglite_bug = TRUE) %>%
+  wtl::insert_layer(wtl::annotate_polygon2(50, 50, 6L, 77, fill = "#eeeeee", colour = "#808080", stroke = 4)) +
+  coord_fixed(xlim = xlim, ylim = ylim)
+phex
+ggsave("hex-heavywatal.svg", phex, height = scale, width = scale * sqrt(3) / 2, dpi = 300, bg = "transparent")
