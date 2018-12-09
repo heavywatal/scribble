@@ -1,37 +1,54 @@
 library(tidyverse)
 
-plot_logo = function(circle_scale=1.0, padding=0) {
+plot_logo = function(scale, expand = 0, svglite_bug = FALSE) {
+  scale = 1 / (1 + 2 * expand) * scale
+  stroke = 1.8 * scale
+  pointsize = 4.5 * scale * ifelse(svglite_bug, 0.75, 1)
+  lim = c(0, 100)
+  .poly = tibble(
+    x = c(1, 7, 99),
+    y = c(36, 21, 72)
+  )
+  # .poly = tibble(
+  #   x = c(1, 8, 99),
+  #   y = c(60, 30, 71)
+  # )
   .path = tibble(
     x = c(35, 11, 55, 41, 75, 71, 95),
     y = c(95, 5, 73, 5, 51, 5, 29)
   )
-  .poly = tibble(
-    x = c(1, 6, 99),
-    y = c(35, 22, 72)
-    # x = c(1, 8, 99),
-    # y = c(60, 30, 71)
-  )
   .dot = tibble(x = 77, y = 77)
   # .dot = tibble(x = 77, y = 83)
-  .limits = c(-padding, 100 + padding)
-  circle_scale = circle_scale * 100 / (100 + 2 * padding)
-  ggplot(.path, aes(x, y)) +
+  ggplot(mapping = aes(x, y)) +
     geom_polygon(data = .poly, fill = "#e08010") +
-    geom_path(size = 6, linejoin = "bevel") +
-    geom_point(size = 18 * circle_scale, data = .dot, colour = "#a4321a") +
-    # geom_point(size = 21 * circle_scale, data = .dot, colour = "#a4321a") +
-    coord_fixed(xlim = .limits, ylim = .limits, expand = FALSE) +
+    geom_path(data = .path, size = stroke, linejoin = "bevel", colour = "#222222") +
+    geom_point(data = .dot, size = pointsize, colour = "#a4321a") +
+    # wtl::annotate_polygon(.dot$x, .dot$y, n = 180L, radius = 7, fill = "#a4321a") +
+    coord_fixed(xlim = lim, ylim = lim) +
+    scale_x_continuous(expand = expand_scale(mult = expand)) +
+    scale_y_continuous(expand = expand_scale(mult = expand)) +
     theme_void()
 }
 
 dev.off()
-quartz(width = 4, height = 4)
-plot_logo()
+quartz(width = 6, height = 6)
+plot_logo(6, 0)
 
-ggsave("heavywatal-white.png", plot_logo(), height = 4, width = 4, dpi = 300)
-ggsave("heavywatal-white-circle.png", plot_logo(padding=12), height = 4, width = 4, dpi = 300)
-ggsave("heavywatal-circle.png", plot_logo(padding=12), height = 4, width = 4, dpi = 300, bg = "transparent")
-ggsave("heavywatal.png", plot_logo(), height = 4, width = 4, dpi = 300, bg = "transparent")
-ggsave("heavywatal-circle.svg", plot_logo(0.75, padding=15), height = 4, width = 4, bg = "transparent")
-ggsave("heavywatal.svg", plot_logo(0.75), height = 4, width = 4, bg = "transparent")
-# svglite bug?
+dev.off()
+quartz(width = 4, height = 4)
+plot_logo(4, 0)
+plot_logo(4, 0.125) %>%
+  wtl::insert_layer(wtl::annotate_polygon(50, 50, 180L, radius = 50 * 1.25, fill = "#cccccc"))
+plot_logo(4, 3)
+
+dev.off()
+quartz(width = 2, height = 2)
+plot_logo(2, 0)
+plot_logo(2, 3)
+
+ggsave("heavywatal-white.png", plot_logo(4), width = 4, height = 4, dpi = 300)
+ggsave("heavywatal-white-circle.png", plot_logo(4, 0.125), width = 4, height = 4, dpi = 300)
+ggsave("heavywatal-circle.png", plot_logo(4, 0.8), width = 4, height = 4, dpi = 300, bg = "transparent")
+ggsave("heavywatal.png", plot_logo(4), width = 4, height = 4, dpi = 300, bg = "transparent")
+ggsave("heavywatal-circle.svg", plot_logo(4, 0.125, svglite_bug = TRUE), width = 4, height = 4, bg = "transparent")
+ggsave("heavywatal.svg", plot_logo(4, 0, svglite_bug = TRUE), width = 4, height = 4, bg = "transparent")
