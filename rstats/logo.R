@@ -52,3 +52,14 @@ ggsave("heavywatal-circle.png", plot_logo(4, 0.8), width = 4, height = 4, dpi = 
 ggsave("heavywatal.png", plot_logo(4), width = 4, height = 4, dpi = 300, bg = "transparent")
 ggsave("heavywatal-circle.svg", plot_logo(4, 0.125, svglite_bug = TRUE), width = 4, height = 4, bg = "transparent")
 ggsave("heavywatal.svg", plot_logo(4, 0, svglite_bug = TRUE), width = 4, height = 4, bg = "transparent")
+
+dev.off()
+scale = 4
+quartz(width = scale * sqrt(3) / 2, height = scale)
+xlim = c(0, 100)
+ylim = (xlim * 2 / sqrt(3)) %>% {. - mean(. - xlim)}
+phex = plot_logo(scale, 0.21) %>%
+  wtl::insert_layer(wtl::annotate_polygon2(50, 50, 6L, 77, fill = "#eeeeee", colour = "#808080", stroke = 4)) +
+  coord_fixed(xlim = xlim, ylim = ylim)
+phex
+ggsave("hex-heavywatal.png", phex, height = scale, width = scale * sqrt(3) / 2, dpi = 300, bg = "transparent")
