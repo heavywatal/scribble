@@ -48,7 +48,7 @@ plot_logo(2, 3)
 
 ggsave("heavywatal-white.png", plot_logo(4), width = 4, height = 4, dpi = 300)
 ggsave("heavywatal-white-circle.png", plot_logo(4, 0.125), width = 4, height = 4, dpi = 300)
-ggsave("heavywatal-circle.png", plot_logo(4, 0.8), width = 4, height = 4, dpi = 300, bg = "transparent")
+ggsave("heavywatal-circle.png", plot_logo(4, 0.125), width = 4, height = 4, dpi = 300, bg = "transparent")
 ggsave("heavywatal.png", plot_logo(4), width = 4, height = 4, dpi = 300, bg = "transparent")
 ggsave("heavywatal-circle.svg", plot_logo(4, 0.125, svglite_bug = TRUE), width = 4, height = 4, bg = "transparent")
 ggsave("heavywatal.svg", plot_logo(4, 0, svglite_bug = TRUE), width = 4, height = 4, bg = "transparent")
