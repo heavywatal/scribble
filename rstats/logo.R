@@ -72,16 +72,19 @@ ggsave("hex-heavywatal.svg", phex, height = scale, width = scale * sqrt(3) / 2, 
 
 # #######1#########2#########3#########4#########5#########6#########7#########
 
+dev.off()
+scale = 4
+quartz(width = scale * sqrt(3) / 2, height = scale)
 radius = 50
 ylim = c(-radius, radius)
 xlim = ylim * sqrt(3) / 2
 hex_tekkamaki = ggplot() +
-  wtl::annotate_polygon2(0, 0, 6L, radius, fill = "#ffffff", colour = "#333333", stroke = 4) +
+  wtl::annotate_polygon2(0, 0, 6L, radius, fill = "#ffffff", colour = "#333333", stroke = 6) +
   wtl::annotate_polygon(0, 0, 6L, radius * 2 / 5, fill = "#C41A41") +
-  scale_x_continuous(expand = expand_scale(mult = 0.05)) +
-  scale_y_continuous(expand = expand_scale(mult = 0.05)) +
+  scale_x_continuous(expand = expand_scale(mult = 0.03)) +
+  scale_y_continuous(expand = expand_scale(mult = 0.03)) +
   coord_fixed(xlim = xlim, ylim = ylim) +
   theme_void()
 hex_tekkamaki
-ggsave("hex-tekkamaki.svg", hex_tekkamaki, height = 4, width = 4 * sqrt(3) / 2, dpi = 300, bg = "transparent")
-ggsave("hex-tekkamaki.png", hex_tekkamaki, height = 4, width = 4 * sqrt(3) / 2, dpi = 300, bg = "transparent")
+ggsave("hex-tekkamaki.svg", hex_tekkamaki, height = scale, width = scale * sqrt(3) / 2, dpi = 300, bg = "transparent")
+ggsave("hex-tekkamaki.png", hex_tekkamaki, height = scale, width = scale * sqrt(3) / 2, dpi = 300, bg = "transparent")
