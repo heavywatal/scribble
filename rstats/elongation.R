@@ -16,6 +16,11 @@ by_index = function(n) {
   for (i in seq_len(n)) {v[i] = i}
   v
 }
+by_index2 = function(n) {
+  v = NULL
+  for (i in seq_len(n)) {v[[i]] = i}
+  v
+}
 by_index_len = function(n) {
   v = NULL
   for (i in seq_len(n)) {v[length(v) + 1L] = i}
@@ -32,6 +37,7 @@ n = 100L
 stopifnot(seq_len(n) == by_append(n))
 stopifnot(seq_len(n) == by_c(n))
 stopifnot(seq_len(n) == by_index(n))
+stopifnot(seq_len(n) == by_index2(n))
 stopifnot(seq_len(n) == by_index_len(n))
 stopifnot(seq_len(n) == by_vapply(n))
 stopifnot(seq_len(n) == by_map_int(n))
@@ -44,6 +50,7 @@ benchmark = function(n , times = 20L) {
     by_vapply(n),
     by_index_len(n),
     by_index(n),
+    by_index2(n),
     seq_len(n),
     times = times
   )
