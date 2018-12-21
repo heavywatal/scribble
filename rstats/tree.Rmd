@@ -45,6 +45,25 @@ library(ape)
 plot.phylo(.phylo, type='unrooted')
 ```
 
+Structure of `phylo`
+```r
+set.seed(24601L)
+.phylo = rtree(6L)
+.phylo
+.phylo$edge
+.phylo$edge[,1L]  # parent
+.phylo$edge[,2L]  # node
+.phylo$edge.length
+.phylo$tip.label
+.phylo$Nnode
+```
+
+```r
+ape::Nnode(.phylo)  # internal.only=TRUE by default
+ape::Ntip(.phylo)
+ape::Nedge(.phylo)
+```
+
 ## Manipulation and visualization of trees
 
 ### statnet (network, sna), ggnet
@@ -160,3 +179,11 @@ geom_tiplab()
 ggtree(.tree, layout='equal_angle')+geom_tiplab()
 ggtree(.tree, layout='daylight')+geom_tiplab()
 ```
+
+
+### ggdendro
+
+- [ggdendro](https://github.com/andrie/ggdendro)
+
+hclust や rpart などの出力をggplotしやすい形にする。
+独立系のシンプルな設計っぽい。
