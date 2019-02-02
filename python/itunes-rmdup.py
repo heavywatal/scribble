@@ -26,7 +26,7 @@ def rmdup(directory, dry_run=False, force=False):
     print(f'{len(duplicated)} duplicates')
     trash = pathlib.Path('~/.Trash').expanduser()
     for files in duplicated.values():
-        old, new = sorted(files, key=lambda x: x.stat().st_c_time)
+        old, new = sorted(files, key=lambda x: x.stat().st_ctime)
         try:
             assert old.stat().st_size < new.stat().st_size
         except AssertionError as err:
