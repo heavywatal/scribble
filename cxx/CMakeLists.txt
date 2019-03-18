@@ -33,6 +33,7 @@ endforeach()
 
 target_link_libraries(benchmark PRIVATE wtl::wtl wtl::sfmt)
 target_link_libraries(boost_coroutine2 PRIVATE Boost::context)
+target_link_libraries(boost_graph PRIVATE Boost::boost)
 target_link_libraries(boost_math PRIVATE Boost::boost)
 target_link_libraries(concurrent PRIVATE wtl::wtl Threads::Threads)
 target_link_libraries(genetic PRIVATE wtl::wtl)
