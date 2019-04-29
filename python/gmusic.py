@@ -3,11 +3,11 @@
 """
 Remove duplicated songs from Google Play Music
 """
-from getpass import getpass
 from gmusicapi import Mobileclient
 
 client = Mobileclient()
-client.login(input('Username:'), getpass(), Mobileclient.FROM_MAC_ADDRESS)
+# client.perform_oauth()  # once
+client.oauth_login(Mobileclient.FROM_MAC_ADDRESS)
 
 all_songs = client.get_all_songs()
 songs_to_keep = {}
@@ -16,7 +16,7 @@ songs_to_delete = {}
 for song in all_songs:
     song_id = song.get('id')
     timestamp = song.get('creationTimestamp')
-    artist = song.get('artist')
+    artist = song.get('albumArtist') or song.get('artist')
     album = song.get('album')
     tracknum = song.get('trackNumber') or 0
     title = song.get('title')
