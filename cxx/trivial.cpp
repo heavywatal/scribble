@@ -11,7 +11,7 @@ class DefaultCtorDefault {
 class DefaultCtorDefaultPlus {
   public:
     DefaultCtorDefaultPlus() = default;
-    explicit DefaultCtorDefaultPlus(int x): _x(x) {}
+    explicit DefaultCtorDefaultPlus(int x): _x(x) {_x += 0;}
   private:
     int _x;
 };
@@ -60,6 +60,7 @@ class Dtor {
 class MemberInit {
   private:
     int _x = 0;
+    void suppress_warnings() {_x += 0;}
 };
 
 class NonTrivMember {
