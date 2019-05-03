@@ -12,7 +12,7 @@ set(CMAKE_CXX_FLAGS_DEV "-O2 -g")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-add_compile_options(-march=native -Wall -Wextra -Wpedantic)
+add_compile_options(-march=native -Wall -Wextra -pedantic)
 
 set(CMAKE_MODULE_PATH "$ENV{HOME}/.cmake/packages")
 include(WarningFlagsCXX OPTIONAL)
