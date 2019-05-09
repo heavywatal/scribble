@@ -129,7 +129,7 @@ quakes %>%
   ggplot(aes(long, lat)) +
   geom_point(aes(size = mag, colour = depth), alpha = 0.4) +
   scale_size_continuous(name = "magnitude", range = c(1, 6), guide = guide_legend(reverse = TRUE)) +
-  scale_colour_viridis(option = "magma", direction = -1, guide = guide_colourbar(reverse = TRUE)) +
+  scale_colour_viridis_c(option = "magma", direction = -1, guide = guide_colourbar(reverse = TRUE)) +
   labs(title = "Quakes", x = "Longitude", y = "Latitude") +
   theme_gray(base_size = 14) +
   theme(
@@ -210,8 +210,7 @@ WorldPhones %>%
 ggplot(diamonds, aes(carat, price)) +
   geom_point(aes(colour = clarity), alpha = 0.5) +
   facet_grid(cut ~ color) +
-  scale_colour_viridis(
-    discrete = TRUE,
+  scale_colour_viridis_d(
     guide = guide_legend(reverse = TRUE, override.aes = list(alpha = 1))
   ) +
   labs(title = "Diamonds") +
@@ -230,6 +229,6 @@ seals %>%
     aes(xend = long + delta_long, yend = lat + delta_lat),
     arrow = arrow(length = unit(1.5, "mm")), size = 1
   ) +
-  scale_colour_viridis(option = "magma", end = 0.7, guide = FALSE) +
+  scale_colour_viridis_c(option = "magma", end = 0.7, guide = FALSE) +
   labs(title = "Seals", x = "Longitude", y = "Latitude") +
   theme_bw(base_size = 14)
