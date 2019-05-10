@@ -42,7 +42,7 @@ stopifnot(seq_len(n) == by_index_len(n))
 stopifnot(seq_len(n) == by_vapply(n))
 stopifnot(seq_len(n) == by_map_int(n))
 
-benchmark = function(n , times = 20L) {
+benchmark = function(n, times = 20L) {
   microbenchmark(
     by_append(n),
     by_c(n),
