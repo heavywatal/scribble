@@ -35,7 +35,7 @@ gear_df = dplyr::bind_rows(
   geom_text(aes(label = sprintf("%.2f", ratio))) +
   facet_grid(. ~ name, scale = "free_x", space = "free_x") +
   scale_fill_distiller(palette = "Spectral") +
-  coord_fixed(expand = FALSE) +
+  coord_cartesian(expand = FALSE) +
   theme_bw() +
   theme(
     panel.grid = element_blank(),
