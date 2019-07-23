@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Move old files to trash, rename new files to old names
 """
 import pathlib

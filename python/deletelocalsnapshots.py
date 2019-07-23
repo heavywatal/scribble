@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Delete Time Machine local backups to shrink initial backup
 defaults read /Library/Preferences/com.apple.TimeMachine MaxSize
 """

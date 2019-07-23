@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Simple wrapper of qsub command of PBS system
 """
 import argparse

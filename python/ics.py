@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 Apple Reminder format (.ics) <-> Plain text
 """

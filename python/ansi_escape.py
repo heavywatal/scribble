@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 ANSI escape sequence
 https://pypi.python.org/pypi/colorama/
