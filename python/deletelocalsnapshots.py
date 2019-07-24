@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-"""Delete Time Machine local backups to shrink initial backup
+"""Delete Time Machine local backups to shrink initial backup.
+
 defaults read /Library/Preferences/com.apple.TimeMachine MaxSize
 """
 import subprocess

@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-"""
-Apple Reminder format (.ics) <-> Plain text
+"""Apple Reminder format (.ics) <-> Plain text
 """
 import re
 import pathlib

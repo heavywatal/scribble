@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-"""
-parse csv exported from lastpass
+"""Parse csv exported from lastpass.
 """
 import csv
 

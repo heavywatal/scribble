@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-"""
-Parse boost::program_options description
+"""Parse boost::program_options description.
 """
 import sys
 import re

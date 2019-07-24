@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-"""Move old files to trash, rename new files to old names
+"""Move old files to trash, rename new files to old names.
 """
 import pathlib
 import shutil

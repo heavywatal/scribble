@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 ANSI escape sequence
 https://pypi.python.org/pypi/colorama/
