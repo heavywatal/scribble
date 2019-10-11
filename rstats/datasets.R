@@ -9,13 +9,14 @@ airquality %>%
   dplyr::summarise_all(mean, na.rm = TRUE)
 
 tidy_anscombe = anscombe %>%
-  tibble::rownames_to_column("id") %>%
-  tidyr::gather(key, value, -id) %>%
-  tidyr::separate(key, c("axis", "group"), 1L) %>%
-  tidyr::spread(axis, value) %>%
+  tibble::rowid_to_column("id") %>%
+  tidyr::pivot_longer(-id,
+    names_to = c("axis", "group"),
+    names_sep = 1L,
+    names_ptypes = list(group = integer())) %>%
+  tidyr::pivot_wider(c(id, group), names_from = axis) %>%
   dplyr::select(-id) %>%
-  dplyr::arrange(group) %>%
-  print()
+  dplyr::arrange(group)
 
 tidy_anscombe %>%
   dplyr::group_by(group) %>%
@@ -119,6 +120,8 @@ mtcars
 # Orange
 OrchardSprays %>% head()
 
+OrchardSprays %>% tidyr::pivot_wider(names_from = colpos, values_from = c(decrease, treatment))
+
 PlantGrowth %>% dplyr::group_by(group) %>% dplyr::summarise_all(mean)
 # precip
 # presidents
@@ -170,7 +173,8 @@ ldeaths # mdeaths + fdeaths
 # USAccDeaths
 # USArrests
 # USJudgeRatings
-USPersonalExpenditure %>% as.data.frame() %>% rownames_to_column("category") %>% tidyr::gather(year, dollar, -category)
+USPersonalExpenditure %>% as.data.frame() %>% rownames_to_column("category") %>%
+  tidyr::pivot_longer(-category, "year", names_ptypes = list(year = integer()), values_to = "dollar")
 # uspop
 
 va_deaths = VADeaths %>%
@@ -179,8 +183,10 @@ va_deaths = VADeaths %>%
   as_tibble() %>%
   tidyr::separate(class, c("lbound", "ubound"), "-", convert = TRUE) %>%
   print() %>%
-  tidyr::gather(people, death_rate, -lbound, -ubound) %>%
-  tidyr::separate(people, c("region", "sex"), " ") %>%
+  tidyr::pivot_longer(c(-lbound, -ubound),
+    names_to = c("region", "sex"),
+    names_sep = " ",
+    values_to = "death_rate") %>%
   dplyr::mutate(death_rate = death_rate * 0.1) %>%
   print()
 
@@ -198,7 +204,7 @@ WorldPhones %>%
   as.data.frame() %>%
   rownames_to_column("year") %>%
   dplyr::mutate(year = as.integer(year)) %>%
-  tidyr::gather(country, phones, -year) %>%
+  tidyr::pivot_longer(-year, "country", values_to = "phones") %>%
   ggplot(aes(year, phones)) +
   geom_line(aes(colour = country)) +
   theme_bw()
@@ -232,3 +238,6 @@ seals %>%
   scale_colour_viridis_c(option = "magma", end = 0.7, guide = FALSE) +
   labs(title = "Seals", x = "Longitude", y = "Latitude") +
   theme_bw(base_size = 14)
+
+economics_long %>%
+  tidyr::pivot_wider(-value01, names_from = variable, values_from = value)
