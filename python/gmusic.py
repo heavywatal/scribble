@@ -1,8 +1,7 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""Remove duplicated songs from Google Play Music.
 """
-Remove duplicated songs from Google Play Music
-"""
+import csv
+import pandas as pd
 from gmusicapi import Mobileclient
 
 client = Mobileclient()
@@ -12,6 +11,26 @@ client.oauth_login(Mobileclient.FROM_MAC_ADDRESS)
 all_songs = client.get_all_songs()
 songs_to_keep = {}
 songs_to_delete = {}
+
+cols = set()
+for song in all_songs:
+    cols.update(song.keys())
+
+with open('gmusic.tsv', 'w') as fout:
+    writer = csv.DictWriter(fout, fieldnames=cols, delimiter='\t')
+    writer.writeheader()
+    for song in all_songs:
+        writer.writerow(song)
+
+df = pd.read_csv('duplicated.tsv', sep='\t')
+
+
+for x in df['id'].tolist():
+    client.delete_songs(x)
+
+
+df['id'].tolist()
+
 
 for song in all_songs:
     song_id = song.get('id')

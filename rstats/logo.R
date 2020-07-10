@@ -88,3 +88,156 @@ hex_tekkamaki = ggplot() +
 hex_tekkamaki
 ggsave("hex-tekkamaki.svg", hex_tekkamaki, height = scale, width = scale * sqrt(3) / 2, dpi = 300, bg = "transparent")
 ggsave("hex-tekkamaki.png", hex_tekkamaki, height = scale, width = scale * sqrt(3) / 2, dpi = 300, bg = "transparent")
+
+# #######1#########2#########3#########4#########5#########6#########7#########
+
+library(tidyverse)
+
+read_matrix_longer = function(data) {
+  .cols = cols(.default = "c")
+  read_delim(data, delim = " ", col_names = FALSE, col_types = .cols) %>%
+    tibble::rowid_to_column("y") %>%
+    tidyr::pivot_longer(-y, names_to = "x", names_prefix = "X") %>%
+    dplyr::mutate(x = as.integer(x))
+}
+
+data = "
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 1 1 1 1 0 0 1 1 1 1 0 0 2 2 0
+0 1 1 1 1 0 0 1 1 1 1 0 0 2 2 0
+0 1 1 0 0 0 0 1 1 0 0 0 0 0 0 0
+0 1 1 0 0 0 0 1 1 0 0 0 0 0 0 0
+0 1 1 1 1 0 0 1 1 1 1 0 0 1 1 0
+0 1 1 1 1 0 0 1 1 1 1 0 0 1 1 0
+0 1 1 0 0 0 0 1 1 0 0 0 0 1 1 0
+0 1 1 0 0 0 0 1 1 0 0 0 0 1 1 0
+0 1 1 1 1 0 0 1 1 1 1 0 0 1 1 0
+0 1 1 1 1 0 0 1 1 1 1 0 0 1 1 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0
+0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 0
+0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+
+data = "
+1 1 0 1 1 0 2
+1 0 0 1 0 0 0
+1 1 0 1 1 0 1
+1 0 0 1 0 0 1
+1 1 0 1 1 0 1
+0 0 0 0 0 0 1
+0 0 0 0 1 1 1
+"
+
+palette = c(`0` = "#eeeeee", `1` = "#006666", `2` = "#C41A41")
+
+data = "
+1 1 1 1 1 1 1 1 1 1 1 0 4
+1 0 0 0 0 0 0 0 0 0 0 0 0
+1 0 2 2 2 2 2 2 2 2 2 2 2
+1 0 0 0 0 0 0 0 0 0 0 0 2
+1 1 1 1 1 1 1 1 1 1 1 0 2
+1 0 0 0 0 0 0 0 0 0 0 0 2
+1 0 2 2 2 2 2 2 2 2 2 2 2
+1 0 0 0 0 0 0 0 0 0 0 0 2
+1 1 1 1 1 1 1 1 1 1 1 0 2
+0 0 0 0 0 0 0 0 0 0 0 0 2
+3 0 2 2 2 2 2 2 2 2 2 2 2
+3 0 0 0 0 0 0 0 0 0 0 0 0
+3 3 3 3 3 3 3 3 3 3 3 3 3
+"
+
+palette = c(`0` = "#ccaa66", `1` = "#333333", `2` = "#333333", `3` = "#333333", `4` = "#c41a41")
+palette = c(`0` = "#664411", `1` = "#ddbb77", `2` = "#ddbb77", `3` = "#cc8855", `4` = "#664411")
+palette = c(`0` = "#cc2222", `1` = "#ccee33", `2` = "#ccee33", `3` = "#ccee33", `4` = "#ccee33")
+
+ggsave("eej-icon.png", p, width = 1, height = 1, dpi = 160)
+ggsave("eej-icon-snake.png", p, width = 1, height = 1, dpi = 160)
+ggsave("eej-icon-snail.png", p, width = 1, height = 1, dpi = 160)
+
+
+
+data = "
+1 1 1 1 1 1 1 1 1 0 3 3 3
+1 0 0 0 0 0 0 0 0 0 0 0 3
+1 0 2 2 2 2 2 2 2 2 2 0 3
+1 0 0 0 0 0 0 0 0 0 2 0 3
+1 1 1 1 1 1 1 1 1 0 2 0 3
+1 0 0 0 0 0 0 0 0 0 2 0 3
+1 0 2 2 2 2 2 2 2 2 2 0 3
+1 0 0 0 0 0 0 0 0 0 2 0 3
+1 1 1 1 1 1 1 1 1 0 2 0 3
+0 0 0 0 0 0 0 0 0 0 2 0 3
+3 0 2 2 2 2 2 2 2 2 2 0 3
+3 0 0 0 0 0 0 0 0 0 0 0 3
+3 3 3 3 3 3 3 3 3 3 3 3 3
+"
+
+palette = function(bg = "#333333", fg1 = "#999999", fg2 = fg1, fg3 = fg1) {
+  c(`0` = bg, `1` = fg1, `2` = fg2, `3` = fg3)
+}
+
+df = read_matrix_longer(data) %>% print()
+
+p = ggplot(df, aes(x, y)) +
+  geom_raster(aes(fill = value)) +
+  scale_y_reverse() +
+  scale_fill_manual(values = palette(), guide = NULL) +
+  coord_fixed(expand = FALSE) +
+  theme_void()
+p
+
+df = bind_rows(
+  tibble(id = "e1", x = c(9, 1, 1, 9, 1, 1, 9), y = c(13, 13, 9, 9, 9, 5, 5)),
+  tibble(id = "e2", x = c(3, 11, 11, 3, 11, 11, 3), y = c(11, 11, 7, 7, 7, 3, 3)),
+  tibble(id = "j", x = c(1, 1, 13, 13, 11), y = c(3, 1, 1, 13, 13))
+) %>% print()
+
+
+
+ggplot(df) +
+  aes(x, y, group = id) +
+  geom_path(size = 20, linejoin = "mitre") +
+  coord_fixed() +
+  theme_void() +
+  theme(plot.background = element_rect("#eeeeee", NA))
+
+
+
+# #######1#########2#########3#########4#########5#########6#########7#########
+
+df = tibble(
+  theta = seq(0, 2 * pi, length.out = 361),
+  x = cos(theta), y = sin(theta)) %>%
+  print()
+
+dev.off()
+quartz(NULL, 1, 1, dpi = 300)
+size = 2.7
+p = ggplot(df, aes(x, y)) +
+  geom_path(size = size, color = "#C41A41") +
+  annotate("line", x = c(-1, 1), y = 0, size = size, color = "#C41A41") +
+  geom_vline(xintercept = 0, size = size, color = "#eeeeee") +
+  coord_fixed(xlim = c(-3, 3), y = c(-3, 3), expand = FALSE) +
+  theme_void() + theme(plot.background = element_rect(fill = "#eeeeee", linetype = 0))
+p
+ggsave("eej-icon-j.png", p, width = 1, height = 1, dpi = 300)
+
+
+set.seed(20200523)
+n = 32
+df = tibble(
+  a = tan(runif(n, 0, 2 * pi)),
+  b = runif(n, 2 * lim[1], 2 * lim[2]),
+  size = runif(n),
+  color = sample(LETTERS[1:7], n, replace = TRUE))
+
+p = ggplot(df) +
+  geom_abline(aes(slope = a, intercept = b, size = size, color = color), alpha = 0.5) +
+  scale_color_brewer(palette = "Set1") +
+  scale_size(range = c(1, 4)) +
+  coord_fixed(xlim = 0.5*lim, ylim = 0.5*lim, expand = FALSE) +
+  theme_void() +
+  theme(legend.position = "none")
+p
+ggsave("eej-icon-uma.png", p, width = 1, height = 1, dpi = 300)
