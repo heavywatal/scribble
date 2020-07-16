@@ -19,30 +19,46 @@ methods %>%
 as.dist(1 - cor(df, method = "spearman"))
 
 # #######1#########2#########3#########4#########5#########6#########7#########
+# unbiased estimator of FST
+# Bhatia et al. 2013 Genome Res.
 
-d = dist(runif(100L) %>% setNames(., seq_along(.)))
-df = tidyr::crossing(x = attributes(d)$Labels, y = x) %>%
-  dplyr::filter(x != y) %>%
-  head(100L) %>%
-  print()
+hexp = function(p1, p2 = p1) p1 * (1 - p2)
 
-calc_index = function(d, x, y) {
-  idx = sort(match(c(x, y), attributes(d)$Labels))
-  size = attributes(d)$Size
-  pos = idx[[2L]] + (idx[[1L]] - 1L) * size - sum(seq_len(idx[[1L]]))
-  d[[pos]]
+na = 1000
+nb = 2000
+pa = 0.2
+pb = 0.3
+(pa - pb) ** 2
+
+a = rbinom(100000, na, pa)
+b = rbinom(100000, nb, pb)
+pa_sam = a / na
+pb_sam = b / nb
+
+within_sam = mean(hexp(pa_sam) + hexp(pb_sam))
+between_sam = mean(hexp(pa_sam, pb_sam) + hexp(pb_sam, pa_sam))
+
+all.equal(between_sam - within_sam, mean((pa_sam - pb_sam) ** 2))
+
+bias = mean(hexp(pa_sam) / (na - 1) + hexp(pb_sam) / (nb - 1))
+bias
+mean((pa_sam - pb_sam) ** 2)
+
+# #######1#########2#########3#########4#########5#########6#########7#########
+
+jukes_cantor_1969 = function(p) {
+  - 3 / 4 * log(1 - 4 * p / 3)
 }
 
-as_matrix_everytime = function(d, x, y) {
-  as.matrix(d)[x, y]
-}
+df = tibble(
+  p = seq(0, 0.6, 0.01),
+  d = jukes_cantor_1969(p)
+) %>% print()
 
-as_matrix_once = function(d, x, y) {
-  d[x, y]
-}
+p = ggplot(df) + aes(p, d) +
+  geom_line(size = 2) +
+  geom_abline(slope = 1, intercept = 0, alpha = 0.5) +
+  coord_fixed(xlim = c(0, 1), ylim = c(0, 1), expand = FALSE)
+p
 
-microbenchmark::microbenchmark(
-  purrr::pmap_dbl(df, calc_index, d = d),
-  purrr::pmap_dbl(df, as_matrix_everytime, d = d),
-  purrr::pmap_dbl(df, as_matrix_once, d = as.matrix(d))
-)
+ggsave("jukes-cantor-1969.png", p, width = 4, height = 4)
