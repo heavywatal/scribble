@@ -1,6 +1,6 @@
 fn get_text() -> Result<String, reqwest::Error> {
     let channel_url = "https://ch.nicovideo.jp/weathernews";
-    println!("get {}", channel_url);
+    eprintln!("get {}", channel_url);
     Ok(reqwest::blocking::get(channel_url)?.text()?)
 }
 
@@ -14,6 +14,6 @@ fn select_latest(body: &str) -> Vec<String> {
 pub fn get_latest_url() -> String {
     let body = get_text().unwrap();
     let urls = select_latest(&body);
-    println!("{:?}", urls);
+    eprintln!("{:?}", urls);
     urls[0].to_string()
 }
