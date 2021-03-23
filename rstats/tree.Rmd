@@ -18,7 +18,7 @@ output:
 ```{r dist, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(Biostrings)
-.text = '
+.text = "
 >a
 AAAAAAAA
 >b
@@ -27,11 +27,11 @@ AAAAAACC
 AAAAGGCC
 >d
 CCTTAAAA
-'
-.file = tempfile(fileext='fa')
-cat(.text, file=.file)
+"
+.file = tempfile(fileext = "fa")
+cat(.text, file = .file)
 .seqs = Biostrings::readDNAStringSet(.file)
-.dist = Biostrings::stringDist(.seqs, method='hamming') %>% print()
+.dist = Biostrings::stringDist(.seqs, method = "hamming") %>% print()
 ```
 
 ## Make trees from distance matrix
@@ -42,7 +42,7 @@ cat(.text, file=.file)
 library(ape)
 #.phylo = ape::nj(.dist)
 .phylo = ape::fastme.ols(.dist)
-plot.phylo(.phylo, type='unrooted')
+plot.phylo(.phylo, type = "unrooted")
 ```
 
 Structure of `phylo`
@@ -85,7 +85,7 @@ ape::Nedge(.phylo)
 
 igraphに比べるとドキュメントが貧弱でツラい。
 
-```{r network}
+```{r network, eval = FALSE}
 library(network)
 library(sna)
 library(GGally)
@@ -115,14 +115,14 @@ library(igraph)
 # igraph::igraph_options(return.vs.es=FALSE)
 
 .tg = tidygraph::as_tbl_graph(.phylo) %>%
-  tidygraph::activate('edges') %>%
+  tidygraph::activate("edges") %>%
   tidygraph::mutate(weight = 1.0 / (.phylo$edge.length + 1e-3)) %>%
   print()
 
-ggraph(.tg, layout='igraph', algorithm='fr')+
-geom_edge_link()+
-geom_node_point(size=8, colour='dodgerblue')+
-geom_node_text(aes(label = name))+
+ggraph(.tg, layout = "igraph", algorithm = "fr") +
+geom_edge_link() +
+geom_node_point(size = 8, colour = "dodgerblue") +
+geom_node_text(aes(label = name)) +
 theme_bw()
 ```
 
@@ -164,20 +164,19 @@ all_系は出力の順番が入力と同じにならないので要注意。
 
 ```{r GuangchuangYu, message=FALSE, warning=FALSE}
 library(tidytree)
-.tbl_tree = tidytree::as_data_frame(.phylo) %>% print()
-.treedata = tidytree::as.treedata(.tbl_tree) %>% print()
-# library(ggtree)
-wtl::refresh('ggtree')
-ggtree(.tree, layout='daylight')+geom_tiplab()
+library(ggtree)
+# load_all("~/fork/ggtree")
 
-ggtree(.phylo)+
-geom_tiplab()
+.tbl_tree = tidytree::as_tibble(.phylo) %>% print()
+.treedata = tidytree::as.treedata(.phylo) %>% print()
 
-.phylo %>% ggtree(layout='daylight')+geom_tiplab()
+ggtree(.phylo) + geom_tiplab()
+
+ggtree(.phylo, layout = "daylight") + geom_tiplab()
 
 .tree = rtree(40)
-ggtree(.tree, layout='equal_angle')+geom_tiplab()
-ggtree(.tree, layout='daylight')+geom_tiplab()
+ggtree(.tree, layout = "equal_angle") + geom_tiplab()
+ggtree(.tree, layout = "daylight") + geom_tiplab()
 ```
 
 
