@@ -4,8 +4,13 @@
 #PBS -l select=1:ncpus=1:mem=1gb
 #PBS -J 0-3
 import os
+import pathlib
 import subprocess
 import numpy as np
+
+script_dir = pathlib.Path(__file__).parent
+print(f'{script_dir=}')
+# /var/spool/pbs/mom_priv/jobs/
 
 os.chdir(os.getenv('PBS_O_WORKDIR', '.'))
 array_index = int(os.getenv('PBS_ARRAY_INDEX', '0'))
