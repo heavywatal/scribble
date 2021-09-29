@@ -33,7 +33,7 @@ gear_df = dplyr::bind_rows(
   ggplot(aes(ordered(x, levels = 3:1), ordered(y, levels = 10:1))) +
   geom_raster(aes(fill = ratio)) +
   geom_text(aes(label = sprintf("%.2f", ratio))) +
-  facet_grid(. ~ name, scale = "free_x", space = "free_x") +
+  facet_grid(cols = vars(name), scale = "free_x", space = "free_x") +
   scale_fill_distiller(palette = "Spectral") +
   coord_cartesian(expand = FALSE) +
   theme_bw() +
@@ -58,7 +58,7 @@ speed_df = tibble::tibble(
   ggplot(aes(ordered(x, levels = 2:1), ordered(y, levels = 10:1))) +
   geom_raster(aes(fill = speed)) +
   geom_text(aes(label = sprintf("%.1f", speed))) +
-  facet_grid(. ~ rpm, labeller = label_both) +
+  facet_grid(cols = vars(rpm), labeller = label_both) +
   scale_fill_distiller(palette = "Spectral") +
   coord_fixed(expand = FALSE) +
   theme_bw() +

@@ -13,7 +13,7 @@ df = tibble(n = c(10, 100, 1000, 10000)) %>%
 ggplot(df) +
   aes(p, pdf) +
   geom_line() +
-  facet_wrap(~n, ncol = 1L, scales = "free_y", strip.position = "right")
+  facet_wrap(vars(n), ncol = 1L, scales = "free_y", strip.position = "right")
 
 ggplot(df) +
   aes(p, pdf) +

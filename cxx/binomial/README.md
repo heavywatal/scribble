@@ -29,7 +29,7 @@ p = ggplot(df) +
   geom_vline(data = lib_mean, aes(xintercept = sum), colour = "tomato") +
   geom_text(data = lib_mean, aes(x = sum, y = 10, label = sum), colour = "tomato") +
   labs(title = "1000 replicates of sum^10000{binom(t=1000, p=0.01)}") +
-  facet_grid(lib ~ .)
+  facet_grid(vars(lib))
 print(p)
 ggsave("dist-sum-binomial.png", p, width = 6, height = 6)
 

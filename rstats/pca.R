@@ -56,7 +56,7 @@ data = iris %>%
   dplyr::group_by(Species) %>%
   dplyr::mutate(rowname = paste0(Species, "-", row_number())) %>%
   dplyr::ungroup() %>%
-  dplyr::select(-Species) %>%
+  dplyr::select(!Species) %>%
   tibble::column_to_rownames()
 
 head(data)
@@ -77,7 +77,7 @@ pc_rotation = pc[["rotation"]] %>%
   as_tibble() %>%
   print()
 
-pc_mean = pc_x %>% dplyr::group_by(Species) %>% dplyr::summarize(across(is.numeric, mean))
+pc_mean = pc_x %>% dplyr::group_by(Species) %>% dplyr::summarize(across(where(is.numeric), mean))
 
 p = ggplot(pc_x) +
   aes(PC1, PC2) +

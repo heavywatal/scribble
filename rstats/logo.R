@@ -97,7 +97,7 @@ read_matrix_longer = function(data) {
   .cols = cols(.default = "c")
   read_delim(data, delim = " ", col_names = FALSE, col_types = .cols) %>%
     tibble::rowid_to_column("y") %>%
-    tidyr::pivot_longer(-y, names_to = "x", names_prefix = "X") %>%
+    tidyr::pivot_longer(!y, names_to = "x", names_prefix = "X") %>%
     dplyr::mutate(x = as.integer(x))
 }
 

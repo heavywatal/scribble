@@ -21,7 +21,8 @@ plot_palette = function(data) {
 
 # #######1#########2#########3#########4#########5#########6#########7#########
 
-viridis_options = c("magma", "inferno", "plasma", "viridis", "cividis")
+viridis_options = c("magma", "inferno", "plasma", "viridis",
+                    "cividis", "mako", "rocket", "turbo")
 
 df_viridis = purrr::map_dfr(viridis_options, function(option) {
   purrr::map_dfr(seq.int(2L, 8L), function(n) {
@@ -35,18 +36,17 @@ df_viridis = purrr::map_dfr(viridis_options, function(option) {
 
 p = df_viridis %>%
   plot_palette()  +
-  facet_wrap(~option, ncol = 1L)
+  facet_wrap(vars(option), ncol = 1L)
 p
-ggsave("viridis.pdf", p, width = 6, height = 9, device = cairo_pdf)
+ggsave("viridis.pdf", p, width = 6, height = 10, device = cairo_pdf)
 
 # #######1#########2#########3#########4#########5#########6#########7#########
 
 brewer_pal = RColorBrewer::brewer.pal.info %>%
   tibble::rownames_to_column(var = "palette") %>%
   tibble::as_tibble() %>%
-  dplyr::select(-maxcolors) %>%
+  dplyr::select(!maxcolors) %>%
   dplyr::filter(category != "seq") %>%
-  dplyr::mutate(palette = factor(palette, levels = palette)) %>%
   print()
 
 df_brewer = brewer_pal %>%
@@ -64,6 +64,6 @@ df_brewer = brewer_pal %>%
 
 p = df_brewer %>%
   plot_palette() +
-  facet_wrap(~palette, ncol = 2L, dir = "v")
+  facet_wrap(vars(palette), ncol = 2L, dir = "v")
 p
 ggsave("brewer.pdf", p, width = 11, height = 14, device = cairo_pdf)

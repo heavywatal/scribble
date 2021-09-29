@@ -19,5 +19,5 @@ k_range = c(0.4, 1, 10, 100)
 ggplot(.df, aes(x)) +
   geom_histogram(bins = 81, center = 0) +
   xlim(-0.5, 80.5) +
-  facet_grid(k ~ dist, labeller = label_both) +
+  facet_grid(vars(k), vars(dist), labeller = label_both) +
   theme_bw()

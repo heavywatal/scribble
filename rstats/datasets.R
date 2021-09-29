@@ -10,12 +10,12 @@ airquality %>%
 
 tidy_anscombe = anscombe %>%
   tibble::rowid_to_column("id") %>%
-  tidyr::pivot_longer(-id,
+  tidyr::pivot_longer(!id,
     names_to = c("axis", "group"),
     names_sep = 1L,
-    names_ptypes = list(group = integer())) %>%
+    names_transform = list(group = as.integer)) %>%
   tidyr::pivot_wider(c(id, group), names_from = axis) %>%
-  dplyr::select(-id) %>%
+  dplyr::select(!id) %>%
   dplyr::arrange(group)
 
 tidy_anscombe %>%
@@ -27,25 +27,25 @@ tidy_anscombe %>%
   )
 
 tidy_anscombe %>%
-  tidyr::nest(-group) %>%
+  tidyr::nest(data = !group) %>%
   dplyr::mutate(data = purrr::map(data, ~{
     summarise_all(.x, funs(mean, sd)) %>%
       dplyr::mutate(cor = cor(.x$x, .x$y))
   })) %>%
-  tidyr::unnest()
+  tidyr::unnest(data)
 
 tidy_anscombe %>%
   ggplot(aes(x, y)) +
   geom_point(size = 3) +
   stat_smooth(method = lm, se = FALSE, fullrange = TRUE) +
-  facet_wrap(~group, nrow = 1L)
+  facet_wrap(vars(group), nrow = 1L)
 
 tidy_anscombe %>%
   ggplot(aes(x, y)) +
   geom_point(size = 2) +
   stat_smooth(method = lm, se = FALSE, fullrange = TRUE) +
   stat_summary(fun.data = mean_se) +
-  facet_wrap(~group)
+  facet_wrap(vars(group))
 
 # attenu
 # attitude
@@ -67,7 +67,7 @@ chickwts %>%
   as_tibble() %>%
   ggplot(aes(weight)) +
   geom_histogram(bins = 10) +
-  facet_wrap(~feed) +
+  facet_wrap(vars(feed)) +
   theme_bw()
 # co2
 # crimtab
@@ -174,7 +174,7 @@ ldeaths # mdeaths + fdeaths
 # USArrests
 # USJudgeRatings
 USPersonalExpenditure %>% as.data.frame() %>% rownames_to_column("category") %>%
-  tidyr::pivot_longer(-category, "year", names_ptypes = list(year = integer()), values_to = "dollar")
+  tidyr::pivot_longer(!category, "year", names_transform = list(year = as.integer), values_to = "dollar")
 # uspop
 
 va_deaths = VADeaths %>%
@@ -183,7 +183,7 @@ va_deaths = VADeaths %>%
   as_tibble() %>%
   tidyr::separate(class, c("lbound", "ubound"), "-", convert = TRUE) %>%
   print() %>%
-  tidyr::pivot_longer(c(-lbound, -ubound),
+  tidyr::pivot_longer(!matches("bound$"),
     names_to = c("region", "sex"),
     names_sep = " ",
     values_to = "death_rate") %>%
@@ -204,7 +204,7 @@ WorldPhones %>%
   as.data.frame() %>%
   rownames_to_column("year") %>%
   dplyr::mutate(year = as.integer(year)) %>%
-  tidyr::pivot_longer(-year, "country", values_to = "phones") %>%
+  tidyr::pivot_longer(!year, "country", values_to = "phones") %>%
   ggplot(aes(year, phones)) +
   geom_line(aes(colour = country)) +
   theme_bw()
@@ -215,7 +215,7 @@ WorldPhones %>%
 
 ggplot(diamonds, aes(carat, price)) +
   geom_point(aes(colour = clarity), alpha = 0.5) +
-  facet_grid(cut ~ color) +
+  facet_grid(vars(cut), vars(color)) +
   scale_colour_viridis_d(
     guide = guide_legend(reverse = TRUE, override.aes = list(alpha = 1))
   ) +
@@ -240,4 +240,4 @@ seals %>%
   theme_bw(base_size = 14)
 
 economics_long %>%
-  tidyr::pivot_wider(-value01, names_from = variable, values_from = value)
+  tidyr::pivot_wider(!value01, names_from = variable, values_from = value)
