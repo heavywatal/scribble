@@ -1,0 +1,19 @@
+digraph boxes_and_circles {
+  graph [fontsize = 18]
+  node [shape = box, fontname = Helvetica]
+
+  'Traditional R plot\nboxplot(), hist(), ...';
+  lattice; ggplot2;
+  graphics; grid;
+  grDevices;
+  pdf; png; svg;
+
+  'Traditional R plot\nboxplot(), hist(), ...' -> graphics
+  graphics -> grDevices
+  lattice -> grid
+  ggplot2 -> grid
+  grid -> grDevices
+  grDevices -> pdf
+  grDevices -> png
+  grDevices -> svg
+}
