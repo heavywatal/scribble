@@ -1,8 +1,9 @@
-#include <cpptoml.h>
+#include <toml.hpp>
 #include <iostream>
 
 int main() {
-    auto obj = cpptoml::parse_file("/Users/watal/git/offline/config.toml");
-    std::cout << *obj << std::endl;
+    std::string file = "/Users/watal/git/offline/config/_default/config.toml";
+    toml::value obj = toml::parse(file);
+    std::cout << obj << std::endl;
     return 0;
 }
