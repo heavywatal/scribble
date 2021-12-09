@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.3)
 project(scribble CXX)
 
 include(GNUInstallDirs)
@@ -19,11 +19,12 @@ include(WarningFlagsCXX OPTIONAL)
 
 set(Boost_NO_BOOST_CMAKE ON)
 find_package(Boost COMPONENTS context)
-message("Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
+message(STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
 
 find_package(Threads)
 find_package(wtl)
 find_package(sfmt)
+find_package(igraph)
 find_package(cpptoml)
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} source_files)
@@ -42,6 +43,7 @@ target_link_libraries(boost_graph PRIVATE Boost::boost)
 target_link_libraries(boost_math PRIVATE Boost::boost)
 target_link_libraries(concurrent PRIVATE wtl::wtl Threads::Threads)
 target_link_libraries(genetic PRIVATE wtl::wtl)
+target_link_libraries(igraph PRIVATE igraph::igraph)
 if(cpptoml_FOUND)
   target_link_libraries(toml PRIVATE cpptoml)
 endif()
