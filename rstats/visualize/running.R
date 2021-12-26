@@ -1,20 +1,28 @@
+library(dplyr)
 
-seconds = function(h=0, m=0, s=0) {
-  s + 60 * m + 3600 * h
+df_seconds = tibble::tibble(pace = seq.int(180, 300, 5)) %>%
+  dplyr::mutate(km10 = pace * 10) %>%
+  dplyr::mutate(half = round(pace * 21.1)) %>%
+  dplyr::mutate(full = round(pace * 42.2)) %>%
+  print()
+
+# #######1#########2#########3#########4#########5#########6#########7#########
+
+library(hms)
+
+df_seconds %>% dplyr::mutate(across(everything(), hms::hms))
+
+# #######1#########2#########3#########4#########5#########6#########7#########
+
+library(lubridate)
+
+format_hms = function(x) {
+  h = lubridate::hour(x)
+  m = lubridate::minute(x)
+  s = lubridate::second(x)
+  sprintf("%02d:%02d:%02d", h, m, s)
 }
-seconds(1, 33, 24)
 
-sprintf_hms = function(seconds) {
-  m = seconds %/% 60L
-  s = seconds %% 60L
-  h = m %/% 60L
-  m = m %% 60L
-  sprintf("%d:%02d:%02d", h, m, round(s))
-}
-seconds(1, 33, 24) %>% sprintf_hms()
-
-tidyr::crossing(m = seq.int(3L, 4L), s = seq.int(0L, 55L, 5L)) %>%
-  dplyr::mutate(seconds = seconds(0L, m, s)) %>%
-  dplyr::mutate(km10 = sprintf_hms(seconds * 10)) %>%
-  dplyr::mutate(half = sprintf_hms(seconds * 21.1)) %>%
-  dplyr::mutate(full = sprintf_hms(seconds * 42.195))
+df_seconds %>%
+  dplyr::mutate(across(everything(), lubridate::seconds_to_period)) %>%
+  dplyr::mutate(across(everything(), format_hms))
