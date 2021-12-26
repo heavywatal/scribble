@@ -21,10 +21,9 @@ test -e ~ && echo 'test -e ~ && echo' || echo 'not printed'
 [[ -e ~ ]] && echo '[[ -e ~ ]] && echo' || echo 'not printed'
 [[ ! -e ~ ]] && echo 'not printed' || echo '[[ ! -e ~ ]] || echo'
 
-# AND OR
-[ -e ~ -a -d ~ ] && echo '[-e ~ -a -d ~]'
-[ -e ~ -o -f ~ ] && echo '[-e ~ -o -f ~]'
+# AND/OR
 [ -e ~ ] && [ -d ~ ] && echo '[ -e ~ ] && [ -d ~ ]'
+[ -e ~ ] || [ -f ~ ] && echo '[ -e ~ ] || [ -f ~ ]'
 [[ -e ~ && -d ~ ]] && echo '[[ -e ~ && -d ~ ]]'
 [[ -e ~ || -f ~ ]] && echo '[[ -e ~ || -f ~ ]]'
 
