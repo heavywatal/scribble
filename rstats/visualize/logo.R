@@ -9,24 +9,23 @@ plot_logo = function(scale, expand = 0, svglite_bug = FALSE) {
     x = c(1, 7, 99),
     y = c(36, 21, 72)
   )
-  # .poly = tibble(
-  #   x = c(1, 8, 99),
-  #   y = c(60, 30, 71)
-  # )
   .path = tibble(
     x = c(35, 11, 55, 41, 75, 71, 95),
     y = c(95, 5, 73, 5, 51, 5, 29)
   )
   .dot = tibble(x = 77, y = 77)
-  # .dot = tibble(x = 77, y = 83)
-  ggplot(mapping = aes(x, y)) +
-    geom_polygon(data = .poly, fill = "#e08010") +
-    geom_path(data = .path, size = stroke, linejoin = "bevel", colour = "#222222") +
-    geom_point(data = .dot, size = pointsize, colour = "#a4321a") +
-    # wtl::annotate_polygon(.dot$x, .dot$y, n = 180L, radius = 7, fill = "#a4321a") +
+  path_color = "#222222"
+  dot_color = "#a4321a"
+  swoosh_color = "#e08010"
+  ggplot() + aes(x, y) +
+    geom_ribbon(aes(x = c(-Inf, 50), y = NULL, ymin = 50, ymax = Inf), fill = "#0057b7") +
+    geom_ribbon(aes(x = c(-Inf, 50), y = NULL, ymin = -Inf, ymax = 50), fill = "#ffd700") +
+    geom_polygon(data = .poly, fill = swoosh_color) +
+    geom_path(data = .path, size = stroke, linejoin = "bevel", color = path_color) +
+    geom_point(data = .dot, size = pointsize, color = dot_color) +
     coord_fixed(xlim = lim, ylim = lim) +
-    scale_x_continuous(expand = expand_scale(mult = expand)) +
-    scale_y_continuous(expand = expand_scale(mult = expand)) +
+    scale_x_continuous(expand = expansion(mult = expand)) +
+    scale_y_continuous(expand = expansion(mult = expand)) +
     theme_void()
 }
 
@@ -46,12 +45,12 @@ quartz(width = 2, height = 2)
 plot_logo(2, 0)
 plot_logo(2, 3)
 
-ggsave("heavywatal-white.png", plot_logo(4), width = 4, height = 4, dpi = 300)
-ggsave("heavywatal-white-circle.png", plot_logo(4, 0.125), width = 4, height = 4, dpi = 300)
-ggsave("heavywatal-circle.png", plot_logo(4, 0.125), width = 4, height = 4, dpi = 300, bg = "transparent")
-ggsave("heavywatal.png", plot_logo(4), width = 4, height = 4, dpi = 300, bg = "transparent")
-ggsave("heavywatal-circle.svg", plot_logo(4, 0.125, svglite_bug = TRUE), width = 4, height = 4, bg = "transparent")
-ggsave("heavywatal.svg", plot_logo(4, 0, svglite_bug = TRUE), width = 4, height = 4, bg = "transparent")
+ggsave("ua-heavywatal-white.png", plot_logo(4), width = 4, height = 4, dpi = 300, bg = "#ffffff")
+ggsave("ua-heavywatal-white-circle.png", plot_logo(4, 0.125), width = 4, height = 4, dpi = 300, bg = "#ffffff")
+ggsave("ua-heavywatal-circle.png", plot_logo(4, 0.125), width = 4, height = 4, dpi = 300, bg = "transparent")
+ggsave("ua-heavywatal.png", plot_logo(4), width = 4, height = 4, dpi = 300, bg = "transparent")
+ggsave("ua-heavywatal-circle.svg", plot_logo(4, 0.125, svglite_bug = TRUE), width = 4, height = 4, bg = "transparent")
+ggsave("ua-heavywatal.svg", plot_logo(4, 0, svglite_bug = TRUE), width = 4, height = 4, bg = "transparent")
 
 dev.off()
 scale = 4
