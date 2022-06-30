@@ -241,3 +241,165 @@ seals %>%
 
 economics_long %>%
   tidyr::pivot_wider(!value01, names_from = variable, values_from = value)
+
+
+# #######1#########2#########3#########4#########5#########6#########7#########
+# install.packages("AER")
+library(AER)
+data_AER = data(package = "AER")[["results"]] %>%
+  as_tibble() %>%
+  dplyr::select(!LibPath) %>%
+  print()
+data_AER[["Item"]] %>% paste(collapse="\n") %>% cat("\n")
+data(list = data_AER[["Item"]], package = "AER")
+
+Affairs %>% as_tibble()
+ArgentinaCPI
+BankWages %>% as_tibble()
+BenderlyZwick
+BondYield
+CASchools %>% as_tibble()
+CPS1985 %>% as_tibble()
+CPS1988 %>% as_tibble()
+CPSSW04 %>% as_tibble()
+CPSSW3 %>% as_tibble()
+CPSSW8 %>% as_tibble()
+CPSSW9204 %>% as_tibble()
+CPSSW9298 %>% as_tibble()
+CPSSWEducation %>% as_tibble()
+CartelStability %>% as_tibble()
+ChinaIncome
+CigarettesB %>% rownames_to_column("state") %>% as_tibble()
+CigarettesSW %>% as_tibble()
+CollegeDistance %>% as_tibble()
+ConsumerGood
+CreditCard %>% as_tibble()
+DJFranses
+DJIA8012
+DoctorVisits %>% as_tibble()
+DutchAdvert
+DutchSales
+Electricity1955 %>% as_tibble()
+Electricity1970 %>% rownames_to_column() %>% as_tibble()
+EquationCitations %>% as_tibble()
+Equipment %>% rownames_to_column("state") %>% as_tibble()
+EuroEnergy %>% rownames_to_column("country") %>% as_tibble()
+Fatalities %>% as_tibble()
+Fertility %>% as_tibble()
+Fertility2 %>% as_tibble()
+FrozenJuice
+GSOEP9402 %>% as_tibble()
+GSS7402 %>% as_tibble()
+GermanUnemployment
+GoldSilver
+GrowthDJ %>% as_tibble()
+GrowthSW %>% rownames_to_column("country") %>% as_tibble()
+Grunfeld %>% as_tibble()
+Guns %>% as_tibble()
+HMDA %>% as_tibble()
+HealthInsurance %>% as_tibble()
+HousePrices %>% as_tibble()
+Journals %>% rownames_to_column("abbrev") %>% as_tibble()
+KleinI
+Longley
+MASchools %>% as_tibble()
+MSCISwitzerland
+ManufactCosts
+MarkDollar
+MarkPound
+Medicaid1986 %>% as_tibble()
+Mortgage %>% as_tibble()
+MotorCycles
+MotorCycles2
+Municipalities %>% as_tibble()
+MurderRates %>% as_tibble()
+NMES1988 %>% as_tibble()
+NYSESW
+NaturalGas %>% as_tibble()
+OECDGas %>% as_tibble()
+OECDGrowth %>% rownames_to_column("country") %>% as_tibble()
+OlympicTV %>% rownames_to_column("city") %>% as_tibble()
+OrangeCounty
+PSID1976 %>% as_tibble()
+PSID1982 %>% as_tibble()
+PSID7682 %>% as_tibble()
+Parade2005 %>% as_tibble()
+PepperPrice
+PhDPublications %>% as_tibble()
+ProgramEffectiveness %>% as_tibble()
+RecreationDemand %>% as_tibble()
+ResumeNames %>% as_tibble()
+SIC33 %>% as_tibble()
+STAR %>% as_tibble()
+ShipAccidents %>% as_tibble()
+SmokeBan %>% as_tibble()
+SportsCards %>% as_tibble()
+StrikeDuration %>% as_tibble()
+SwissLabor %>% as_tibble()
+TeachingRatings %>% as_tibble()
+TechChange
+TradeCredit
+TravelMode %>% as_tibble()
+UKInflation
+UKNonDurables
+USAirlines %>% as_tibble()
+USConsump1950
+USConsump1979
+USConsump1993
+USCrudes %>% as_tibble()
+USGasB
+USGasG
+USInvest
+USMacroB
+USMacroG
+USMacroSW
+USMacroSWM
+USMacroSWQ
+USMoney
+USProdIndex
+USSeatBelts %>% as_tibble()
+USStocksSW
+WeakInstrument %>% as_tibble()
+
+
+# #######1#########2#########3#########4#########5#########6#########7#########
+# install.packages("COUNT")
+library(COUNT)
+data_COUNT = data(package = "COUNT")[["results"]] %>%
+  as_tibble() %>%
+  dplyr::select(!LibPath) %>%
+  print()
+data(list = data_COUNT[["Item"]], package = "COUNT")
+
+affairs %>% as_tibble()
+azcabgptca %>% as_tibble()
+azdrg112 %>% as_tibble()
+azpro %>% as_tibble()
+azprocedure %>% as_tibble()
+
+badhealth %>% as_tibble() %>%
+  ggplot() +
+  aes(numvisit, badh) +
+  geom_jitter(aes(color = age), height = 0.2, width = 0, alpha = 0.5) +
+  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = binomial))
+
+fasttrakg %>% as_tibble()
+fishing %>% as_tibble()
+lbw %>% as_tibble()
+lbwgrp %>% as_tibble()
+loomis %>% as_tibble()
+mdvis %>% as_tibble() %>% plot()
+medpar %>% as_tibble()
+nuts %>% as_tibble()
+rwm %>% as_tibble() %>% plot()
+rwm1984 %>% as_tibble()
+rwm5yr %>% as_tibble()
+ships %>% as_tibble()
+smoking %>% as_tibble()
+titanic %>% as_tibble()
+titanicgrp %>% as_tibble()
+
+MASS::ships %>% as_tibble() %>%
+  ggplot() +
+  aes(log10(service), incidents) +
+  geom_point(aes(color = type), alpha = 0.6)
