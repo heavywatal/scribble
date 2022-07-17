@@ -1,10 +1,16 @@
 library(tidyverse)
 
 plot_logo = function(scale, expand = 0, svglite_bug = FALSE) {
-  scale = 1 / (1 + 2 * expand) * scale
+  scale = 1 / (1 + 2 * max(expand)) * scale
   stroke = 1.8 * scale
   pointsize = 4.5 * scale * ifelse(svglite_bug, 0.75, 1)
-  lim = c(0, 100)
+  if (length(expand) == 1L) {
+    expand = rep(expand, 2L)
+  }
+  margin = 100 * expand
+  mlim = matrix(c(-margin, 100 + margin), ncol = 2L)
+  xlim = mlim[1L, ]
+  ylim = mlim[2L, ]
   .poly = tibble(
     x = c(1, 7, 99),
     y = c(36, 21, 72)
@@ -23,11 +29,10 @@ plot_logo = function(scale, expand = 0, svglite_bug = FALSE) {
     geom_polygon(data = .poly, fill = swoosh_color) +
     geom_path(data = .path, size = stroke, linejoin = "bevel", color = path_color) +
     geom_point(data = .dot, size = pointsize, color = dot_color) +
-    coord_fixed(xlim = lim, ylim = lim) +
-    scale_x_continuous(expand = expansion(mult = expand)) +
-    scale_y_continuous(expand = expansion(mult = expand)) +
-    theme_void()
+    coord_fixed(xlim = xlim, ylim = ylim, expand = FALSE)
 }
+
+ggplot2::theme_set(theme_void())
 
 dev.off()
 quartz(width = 6, height = 6)
@@ -35,9 +40,9 @@ plot_logo(6, 0)
 
 dev.off()
 quartz(width = 4, height = 4)
-plot_logo(4, 0)
+plot_logo(4, 0.1)
 plot_logo(4, 0.125) %>%
-  wtl::insert_layer(wtl::annotate_polygon(50, 50, 180L, radius = 50 * 1.25, fill = "#cccccc"))
+  wtl::insert_layer(wtl::annotate_regpolygon(180L, radius = 50 * 1.25, x = 50, y = 50, alpha = 0.3))
 plot_logo(4, 3)
 
 dev.off()
@@ -55,17 +60,12 @@ ggsave("ua-heavywatal.svg", plot_logo(4, 0, svglite_bug = TRUE), width = 4, heig
 dev.off()
 scale = 4
 quartz(width = scale * sqrt(3) / 2, height = scale)
-xlim = c(0, 100)
-ylim = (xlim * 2 / sqrt(3)) %>% {. - mean(. - xlim)}
-phex = plot_logo(scale, 0.21) %>%
-  wtl::insert_layer(wtl::annotate_polygon2(50, 50, 6L, 77, fill = "#eeeeee", colour = "#808080", stroke = 4)) +
-  coord_fixed(xlim = xlim, ylim = ylim)
+hexa = wtl::annotate_regpolygon(6L, 77, x = 50, y = 50, linewidth = 4, fill = "#eeeeee", color = "#808080")
+phex = plot_logo(scale, c(0.2, 0.3)) %>% wtl::insert_layer(hexa)
 phex
 ggsave("hex-heavywatal.png", phex, height = scale, width = scale * sqrt(3) / 2, dpi = 300, bg = "transparent")
 
-phex = plot_logo(scale, 0.21, svglite_bug = TRUE) %>%
-  wtl::insert_layer(wtl::annotate_polygon2(50, 50, 6L, 77, fill = "#eeeeee", colour = "#808080", stroke = 4)) +
-  coord_fixed(xlim = xlim, ylim = ylim)
+phex = plot_logo(scale, c(0.2, 0.3), svglite_bug = TRUE) %>% wtl::insert_layer(hexa)
 phex
 ggsave("hex-heavywatal.svg", phex, height = scale, width = scale * sqrt(3) / 2, dpi = 300, bg = "transparent")
 
@@ -78,10 +78,10 @@ radius = 50
 ylim = c(-radius, radius)
 xlim = ylim * sqrt(3) / 2
 hex_tekkamaki = ggplot() +
-  wtl::annotate_polygon2(0, 0, 6L, radius, fill = "#ffffff", colour = "#333333", stroke = 6) +
-  wtl::annotate_polygon(0, 0, 6L, radius * 2 / 5, fill = "#C41A41") +
-  scale_x_continuous(expand = expand_scale(mult = 0.03)) +
-  scale_y_continuous(expand = expand_scale(mult = 0.03)) +
+  wtl::annotate_regpolygon(6L, radius, linewidth = 6, color = "#333333", fill = "#ffffff") +
+  wtl::annotate_regpolygon(6L, radius * 2 / 5, fill = "#C41A41") +
+  scale_x_continuous(expand = expansion(mult = 0.03)) +
+  scale_y_continuous(expand = expansion(mult = 0.03)) +
   coord_fixed(xlim = xlim, ylim = ylim) +
   theme_void()
 hex_tekkamaki
