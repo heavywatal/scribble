@@ -8,7 +8,7 @@ tibble::as_tibble(t(vec))
 # #######1#########2#########3#########4#########5#########6#########7#########
 
 bench::mark(
-  tibble = wtl::redirect(tibble:::print.tbl(ggplot2::diamonds)),
+  pillar = wtl::redirect(pillar:::print.tbl(ggplot2::diamonds)),
   data.table = wtl::redirect(data.table:::print.data.table(ggplot2::diamonds)),
   wtl = wtl::redirect(wtl:::printdf(ggplot2::diamonds))
 )
@@ -27,7 +27,7 @@ forloop = function(.x, .f) {
 
 bench::mark(
   Reduce = Reduce(`+`, df),
-  reduce = reduce(df, `+`),
+  reduce = purrr::reduce(df, `+`),
   rowSums = rowSums(df),
   apply = apply(df, 1, sum),
   "for" = forloop(df, `+`)
