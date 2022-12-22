@@ -24,7 +24,7 @@ message(STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
 find_package(Threads)
 find_package(wtl)
 find_package(sfmt)
-find_package(igraph)
+find_package(igraph 0.10.2)
 find_package(toml11)
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} source_files)

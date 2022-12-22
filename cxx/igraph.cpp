@@ -3,12 +3,12 @@
 
 int main() {
   igraph_t graph;
-  igraph_vector_t v;
-  igraph_real_t edges[] = {
+  igraph_vector_int_t v;
+  igraph_integer_t edges[] = {
     0, 1,
     0, 2
   };
-  igraph_vector_view(&v, edges, sizeof(edges) / sizeof(double));
+  igraph_vector_int_view(&v, edges, sizeof(edges) / sizeof(double));
   igraph_create(&graph, &v, 0, true);
 
   igraph_real_t res;
