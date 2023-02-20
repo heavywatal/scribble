@@ -20,7 +20,7 @@ outdir = fs::path("wallpaper")
 fs::dir_create(outdir)
 
 df_use = df |>
-  dplyr::filter(azimuth %in% seq.int(0L, 180L, length.out = 13L)) |>
+  dplyr::filter(azimuth %in% seq.int(0L, 360L, length.out = 13L)) |>
   dplyr::mutate(across(where(is.double), round, 3)) |>
   readr::write_tsv(outdir / "equinox.tsv") |>
   print()
@@ -37,7 +37,7 @@ ggsave(outdir / "equinox.png", p, width = 6, height = 4) |>
 
 p_void = ggplot() + theme_void()
 df_use |>
-  dplyr::mutate(outfile = outdir / sprintf("gray-%04d.png", round(1000 * level))) |>
+  dplyr::mutate(outfile = outdir / sprintf("gray-%03d.png", azimuth)) |>
   purrr::pwalk(\(outfile, color, ...) {
     ggsave(outfile, p_void, bg = color, width = 16, height = 9, dpi = 100) |>
       wtl::oxipng() |>
