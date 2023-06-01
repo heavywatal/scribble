@@ -1,3 +1,4 @@
+library(conflicted)
 library(tidyverse)
 
 # convert to 1-row tibble
@@ -15,7 +16,7 @@ bench::mark(
 
 # #######1#########2#########3#########4#########5#########6#########7#########
 
-df = diamonds %>% select(where(is.numeric))
+df = ggplot2::diamonds |> dplyr::select(where(is.numeric))
 
 forloop = function(.x, .f) {
   y = numeric(nrow(.x))
@@ -32,3 +33,9 @@ bench::mark(
   apply = apply(df, 1, sum),
   "for" = forloop(df, `+`)
 )
+
+# too slow
+df |>
+  head(2000L) |>
+  dplyr::rowwise() |>
+  dplyr::mutate(x = sum(dplyr::c_across(everything())))
