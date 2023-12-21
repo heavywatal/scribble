@@ -39,3 +39,11 @@ df |>
   head(2000L) |>
   dplyr::rowwise() |>
   dplyr::mutate(x = sum(dplyr::c_across(everything())))
+
+# #######1#########2#########3#########4#########5#########6#########7#########
+
+mtcars_csv = readr::readr_example("mtcars.csv") |> rep(20)
+bench::mark(
+  readr::read_tsv(mtcars_csv)[],
+  purrr::map(mtcars_csv, read_tsv) |> purrr::list_rbind()
+)
