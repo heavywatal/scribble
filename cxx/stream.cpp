@@ -19,5 +19,12 @@ int main() {
     ss.clear();  // reset state flags
     ss << "Bye\n";
     std::cout << ss.rdbuf();
+
+    // Check rdbuf().in_avail(), otherwise
+    std::stringstream empty;
+    std::cout << empty.rdbuf();
+    // std::cout.setstate(badbit) exits silently unless
+    // std::cout.exceptions(std::ios_base::badbit);
+    std::cout << "not printed" << std::endl;
     return 0;
 }
