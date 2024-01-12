@@ -2,7 +2,7 @@
 from collections.abc import Sequence
 
 
-def dangerous(mutarg: list[int] = []):  # noqa: B006
+def dangerous(mutarg: list[int] = []) -> list[int]:  # noqa: B006
     mutarg.append(1)
     return mutarg
 
@@ -13,7 +13,7 @@ assert dangerous([2]) == [2, 1]
 assert dangerous() == [1, 1, 1]  # surprising!
 
 
-def partial_safety_by_annotation(pseudo_immut: Sequence[str] = ()):
+def partial_safety_by_annotation(pseudo_immut: Sequence[str] = ()) -> Sequence[str]:
     """Can receive mutable as well, but linter blames mutation."""
     # pseudo_immut.append("blamed")
     if isinstance(pseudo_immut, list):

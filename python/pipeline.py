@@ -16,7 +16,7 @@ head = ["head", "-n", str(n_head)]
 wc = ["wc"]
 
 
-def main():
+def main() -> None:
     print(f"{n = }, {n_head = }")
     print(f"{_with_parens() = }")
     print(f"{_with_nested() = }")
@@ -28,7 +28,7 @@ def main():
     print(f"{_without_rev() = }")
 
 
-def _with_parens():  # no deadlock unless unnecessary wait() with large n
+def _with_parens() -> bytes:  # no deadlock unless unnecessary wait() with large n
     with (
         Popen(seq, stdout=PIPE) as pseq,
         Popen(tee, stdin=pseq.stdout, stdout=PIPE, stderr=DEVNULL) as ptee,
@@ -49,7 +49,7 @@ def _with_parens():  # no deadlock unless unnecessary wait() with large n
     return result
 
 
-def _with_nested():
+def _with_nested() -> bytes:
     with Popen(seq, stdout=PIPE) as pseq:
         with Popen(tee, stdin=pseq.stdout, stdout=PIPE, stderr=DEVNULL) as ptee:
             with Popen(head, stdin=ptee.stdout, stdout=PIPE) as phead:
@@ -70,7 +70,7 @@ def _with_nested():
     return result
 
 
-def _with_nested_explicit():
+def _with_nested_explicit() -> bytes:
     with Popen(seq, stdout=PIPE) as pseq:
         with Popen(tee, stdin=pseq.stdout, stdout=PIPE, stderr=DEVNULL) as ptee:
             pseq.stdout.close() if pseq.stdout else None
@@ -85,7 +85,7 @@ def _with_nested_explicit():
     return result
 
 
-def _with_parens_explicit():  # redundant but robust
+def _with_parens_explicit() -> bytes:  # redundant but robust
     with (
         Popen(seq, stdout=PIPE) as pseq,
         Popen(tee, stdin=pseq.stdout, stdout=PIPE, stderr=DEVNULL) as ptee,
@@ -102,7 +102,8 @@ def _with_parens_explicit():  # redundant but robust
     return result
 
 
-def _with_parens_rev():  # tends to deadlock with small n without explicit closing
+def _with_parens_rev() -> bytes:
+    # tends to deadlock with small n without explicit closing
     with (
         Popen(wc, stdin=PIPE, stdout=PIPE) as pwc,
         Popen(head, stdin=PIPE, stdout=pwc.stdin) as phead,
@@ -123,7 +124,7 @@ def _with_parens_rev():  # tends to deadlock with small n without explicit closi
     return result
 
 
-def _with_nested_rev():
+def _with_nested_rev() -> bytes:
     with Popen(wc, stdin=PIPE, stdout=PIPE) as pwc:
         with Popen(head, stdin=PIPE, stdout=pwc.stdin) as phead:
             with Popen(tee, stdin=PIPE, stdout=phead.stdin, stderr=DEVNULL) as ptee:
@@ -146,7 +147,7 @@ def _with_nested_rev():
     return result
 
 
-def _without():
+def _without() -> bytes:
     pseq = Popen(seq, stdout=PIPE)
     ptee = Popen(tee, stdin=pseq.stdout, stdout=PIPE, stderr=DEVNULL)
     pseq.stdout.close() if pseq.stdout else None  # to receive SIGPIPE from ptee

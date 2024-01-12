@@ -2,28 +2,28 @@
 
 defaults read /Library/Preferences/com.apple.TimeMachine MaxSize
 """
+import argparse
 import subprocess
 
 
-def listlocalsnapshots():
-    args = ['/usr/bin/tmutil', 'listlocalsnapshots', '/']
-    proc = subprocess.run(args, stdout=subprocess.PIPE)
+def listlocalsnapshots() -> list[str]:
+    args = ["/usr/bin/tmutil", "listlocalsnapshots", "/"]
+    proc = subprocess.run(args, stdout=subprocess.PIPE, check=True)
     stdout = proc.stdout.decode()
-    return stdout.split('\n')
+    return stdout.split("\n")
 
 
-def deletelocalsnapshots(date):
-    args = ['/usr/bin/tmutil', 'deletelocalsnapshots', date]
-    subprocess.run(args)
+def deletelocalsnapshots(date: str) -> None:
+    args = ["/usr/bin/tmutil", "deletelocalsnapshots", date]
+    subprocess.run(args, check=True)
 
 
-def main():
-    import argparse
+def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument('-n', '--dry-run', action='store_true')
+    parser.add_argument("-n", "--dry-run", action="store_true")
     args = parser.parse_args()
     snapshots = listlocalsnapshots()
-    dates = [x.rsplit('.', 1)[-1] for x in snapshots if x]
+    dates = [x.rsplit(".", 1)[-1] for x in snapshots if x]
     print(dates)
     for date in dates:
         print(date)
@@ -31,5 +31,5 @@ def main():
             deletelocalsnapshots(date)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

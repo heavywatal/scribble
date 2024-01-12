@@ -1,5 +1,3 @@
-"""
-"""
 import matplotlib.pyplot as plt
 from pydataset import data
 
@@ -12,7 +10,7 @@ fig = plt.figure()
 ax = fig.subplots()
 
 # Plot on this ax
-ax.scatter('Sepal.Width', 'Sepal.Length', data=iris)
+ax.scatter("Sepal.Width", "Sepal.Length", data=iris)
 
 # Show figure (in Jupyter, Hydrogen, or other inline IPython environments)
 # display(fig)
@@ -22,4 +20,4 @@ fig.show()
 plt.close(fig)
 
 # Write to a file
-fig.savefig('iris-sepal.png')
+fig.savefig("iris-sepal.png")
