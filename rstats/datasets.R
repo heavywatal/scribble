@@ -1,47 +1,45 @@
 library(tidyverse)
-# https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/00Index.html
+# https://stat.ethz.ch/R-manual/R-patched/library/datasets/html/00Index.html
 
 # ability.cov
 # airmiles
 # AirPassengers
-airquality %>%
-  dplyr::group_by(Month) %>%
-  dplyr::summarise_all(mean, na.rm = TRUE)
+airquality |>
+  as_tibble() |>
+  print() |>
+  dplyr::summarize(across(everything(), \(x) mean(x, na.rm = TRUE)), .by = Month)
 
-tidy_anscombe = anscombe %>%
-  tibble::rowid_to_column("id") %>%
+tidy_anscombe = anscombe |>
+  tibble::rowid_to_column("id") |>
   tidyr::pivot_longer(!id,
     names_to = c("axis", "group"),
     names_sep = 1L,
-    names_transform = list(group = as.integer)) %>%
-  tidyr::pivot_wider(c(id, group), names_from = axis) %>%
-  dplyr::select(!id) %>%
-  dplyr::arrange(group)
+    names_transform = list(group = as.integer)
+  ) |>
+  tidyr::pivot_wider(id_cols = c(id, group), names_from = axis) |>
+  dplyr::select(!id) |>
+  dplyr::arrange(group) |>
+  print()
 
-tidy_anscombe %>%
-  dplyr::group_by(group) %>%
-  dplyr::summarise(
+tidy_anscombe |>
+  dplyr::group_by(group) |>
+  dplyr::summarize(
     x_mean = mean(x), x_sd = sd(x),
     y_mean = mean(y), y_sd = sd(y),
     cor_xy = cor(x, y)
   )
 
-tidy_anscombe %>%
-  tidyr::nest(data = !group) %>%
-  dplyr::mutate(data = purrr::map(data, ~{
-    summarise_all(.x, funs(mean, sd)) %>%
+tidy_anscombe |>
+  tidyr::nest(data = !group) |>
+  dplyr::mutate(data = purrr::map(data, \(.x) {
+    .x |>
+      dplyr::summarize(across(everything(), list(mean = mean, sd = sd))) |>
       dplyr::mutate(cor = cor(.x$x, .x$y))
-  })) %>%
+  })) |>
   tidyr::unnest(data)
 
-tidy_anscombe %>%
-  ggplot(aes(x, y)) +
-  geom_point(size = 3) +
-  stat_smooth(method = lm, se = FALSE, fullrange = TRUE) +
-  facet_wrap(vars(group), nrow = 1L)
-
-tidy_anscombe %>%
-  ggplot(aes(x, y)) +
+tidy_anscombe |>
+  ggplot() + aes(x, y) +
   geom_point(size = 2) +
   stat_smooth(method = lm, se = FALSE, fullrange = TRUE) +
   stat_summary(fun.data = mean_se) +
@@ -56,16 +54,18 @@ tidy_anscombe %>%
 # BOD
 
 # cars
-ChickWeight %>%
-  ggplot(aes(Time, weight, group = Chick)) +
+ChickWeight |>
+  ggplot() + aes(Time, weight, group = Chick) +
   geom_line(aes(colour = Diet)) +
   theme_bw()
 
-chickwts %>% dplyr::group_by(feed) %>% dplyr::summarise_all(funs(mean, sd, length))
+chickwts |>
+  dplyr::group_by(feed) |>
+  dplyr::summarize(across(everything(), list(mean = mean, sd = sd, n = length)))
 
-chickwts %>%
-  as_tibble() %>%
-  ggplot(aes(weight)) +
+chickwts |>
+  as_tibble() |>
+  ggplot() + aes(weight) +
   geom_histogram(bins = 10) +
   facet_wrap(vars(feed)) +
   theme_bw()
@@ -80,9 +80,9 @@ esoph
 # eurodist
 # EuStockMarkets
 
-(faithful %>%
-  ggplot(aes(eruptions, waiting)) +
-  geom_point()) %>%
+(faithful |>
+  ggplot() + aes(eruptions, waiting) +
+  geom_point()) |>
   ggExtra::ggMarginal(type = "histogram")
 
 # freeny
@@ -94,7 +94,7 @@ HairEyeColor
 
 Indometh
 # infert
-InsectSprays %>% head()
+InsectSprays |> head()
 iris
 iris3
 # islands
@@ -118,29 +118,32 @@ mtcars
 
 # occupationalStatus
 # Orange
-OrchardSprays %>% head()
+OrchardSprays |> head()
 
-OrchardSprays %>% tidyr::pivot_wider(names_from = colpos, values_from = c(decrease, treatment))
+OrchardSprays |>
+  tidyr::pivot_wider(names_from = colpos, values_from = c(decrease, treatment))
 
-PlantGrowth %>% dplyr::group_by(group) %>% dplyr::summarise_all(mean)
+PlantGrowth |>
+  dplyr::group_by(group) |>
+  dplyr::summarize(across(everything(), mean))
 # precip
 # presidents
 pressure
 # Puromycin
 
-quakes %>%
-  ggplot(aes(long, lat)) +
-  geom_point(aes(size = mag, colour = depth), alpha = 0.4) +
+quakes |>
+  ggplot() + aes(long, lat) +
+  geom_point(aes(size = mag, color = depth), alpha = 0.4) +
   scale_size_continuous(name = "magnitude", range = c(1, 6), guide = guide_legend(reverse = TRUE)) +
   scale_colour_viridis_c(option = "magma", direction = -1, guide = guide_colourbar(reverse = TRUE)) +
   labs(title = "Quakes", x = "Longitude", y = "Latitude") +
   theme_gray(base_size = 14) +
   theme(
     panel.grid.minor = element_blank(),
-    panel.background = element_rect(fill = "#8090a0"),
+    panel.background = element_rect(fill = "#8090a0")
   )
 
-# randu %>% ggplot(aes(x, y, colour=z))+geom_point()
+# randu |> ggplot(aes(x, y, colour=z))+geom_point()
 # rivers
 # rock
 
@@ -153,14 +156,14 @@ tibble::tibble(
   abb = state.abb,
   division = state.division,
   region = state.region
-) %>%
-  bind_cols(as_tibble(state.x77)) %>%
+) |>
+  bind_cols(as_tibble(state.x77)) |>
   bind_cols(state.center)
 
 # sunspot.month sunspot.year sunspots
 # swiss
 
-# Theoph %>% head()
+# Theoph |> head()
 Titanic
 # ToothGrowth
 # treering
@@ -173,24 +176,28 @@ ldeaths # mdeaths + fdeaths
 # USAccDeaths
 # USArrests
 # USJudgeRatings
-USPersonalExpenditure %>% as.data.frame() %>% rownames_to_column("category") %>%
-  tidyr::pivot_longer(!category, "year", names_transform = list(year = as.integer), values_to = "dollar")
+USPersonalExpenditure |>
+  as.data.frame() |>
+  tibble::rownames_to_column("category") |>
+  tidyr::pivot_longer(!category, names_to = "year", names_transform = list(year = as.integer), values_to = "dollar")
 # uspop
 
-va_deaths = VADeaths %>%
-  as.data.frame() %>%
-  tibble::rownames_to_column("class") %>%
-  as_tibble() %>%
-  tidyr::separate(class, c("lbound", "ubound"), "-", convert = TRUE) %>%
-  print() %>%
+va_deaths = VADeaths |>
+  as.data.frame() |>
+  tibble::rownames_to_column("class") |>
+  tibble::as_tibble() |>
+  tidyr::separate(class, c("lbound", "ubound"), "-", convert = TRUE) |>
+  print() |>
   tidyr::pivot_longer(!matches("bound$"),
     names_to = c("region", "sex"),
     names_sep = " ",
-    values_to = "death_rate") %>%
-  dplyr::mutate(death_rate = death_rate * 0.1) %>%
+    values_to = "death_rate"
+  ) |>
+  dplyr::mutate(death_rate = death_rate * 0.1) |>
   print()
 
-ggplot(va_deaths, aes(lbound, death_rate)) +
+ggplot(va_deaths) +
+  aes(lbound, death_rate) +
   geom_line(aes(colour = sex, linetype = region), size = 1) +
   theme_bw()
 
@@ -200,12 +207,13 @@ ggplot(va_deaths, aes(lbound, death_rate)) +
 # women
 # WWWusage
 
-WorldPhones %>%
-  as.data.frame() %>%
-  rownames_to_column("year") %>%
-  dplyr::mutate(year = as.integer(year)) %>%
-  tidyr::pivot_longer(!year, "country", values_to = "phones") %>%
-  ggplot(aes(year, phones)) +
+WorldPhones |>
+  as.data.frame() |>
+  tibble::rownames_to_column("year") |>
+  dplyr::mutate(year = as.integer(year)) |>
+  tidyr::pivot_longer(!year, names_to = "country", values_to = "phones") |>
+  ggplot() +
+  aes(year, phones) +
   geom_line(aes(colour = country)) +
   theme_bw()
 
@@ -213,7 +221,8 @@ WorldPhones %>%
 # #######1#########2#########3#########4#########5#########6#########7#########
 # ggplot2
 
-ggplot(diamonds, aes(carat, price)) +
+ggplot(diamonds) +
+  aes(carat, price) +
   geom_point(aes(colour = clarity), alpha = 0.5) +
   facet_grid(vars(cut), vars(color)) +
   scale_colour_viridis_d(
@@ -228,125 +237,144 @@ ggplot(diamonds, aes(carat, price)) +
     axis.text = element_blank(), axis.ticks = element_blank()
   )
 
-seals %>%
-  dplyr::mutate(v = sqrt(delta_lat ** 2 + delta_long ** 2)) %>%
-  ggplot(aes(x = long, y = lat, colour = v)) +
+seals |>
+  dplyr::mutate(v = sqrt(delta_lat**2 + delta_long**2)) |>
+  ggplot() +
+  aes(x = long, y = lat, colour = v) +
   geom_segment(
     aes(xend = long + delta_long, yend = lat + delta_lat),
     arrow = arrow(length = unit(1.5, "mm")), size = 1
   ) +
-  scale_colour_viridis_c(option = "magma", end = 0.7, guide = FALSE) +
+  scale_colour_viridis_c(option = "magma", end = 0.7, guide = "none") +
   labs(title = "Seals", x = "Longitude", y = "Latitude") +
   theme_bw(base_size = 14)
 
-economics_long %>%
+economics_long |>
   tidyr::pivot_wider(!value01, names_from = variable, values_from = value)
 
 
 # #######1#########2#########3#########4#########5#########6#########7#########
 # install.packages("AER")
 library(AER)
-data_AER = data(package = "AER")[["results"]] %>%
-  as_tibble() %>%
-  dplyr::select(!LibPath) %>%
+data_AER = data(package = "AER")[["results"]] |>
+  tibble::as_tibble() |>
+  dplyr::select(!LibPath) |>
   print()
-data_AER[["Item"]] %>% paste(collapse="\n") %>% cat("\n")
+data_AER[["Item"]] |>
+  paste(collapse = "\n") |>
+  cat("\n")
 data(list = data_AER[["Item"]], package = "AER")
 
-Affairs %>% as_tibble()
+Affairs |> as_tibble()
 ArgentinaCPI
-BankWages %>% as_tibble()
+BankWages |> as_tibble()
 BenderlyZwick
 BondYield
-CASchools %>% as_tibble()
-CPS1985 %>% as_tibble()
-CPS1988 %>% as_tibble()
-CPSSW04 %>% as_tibble()
-CPSSW3 %>% as_tibble()
-CPSSW8 %>% as_tibble()
-CPSSW9204 %>% as_tibble()
-CPSSW9298 %>% as_tibble()
-CPSSWEducation %>% as_tibble()
-CartelStability %>% as_tibble()
+CASchools |> as_tibble()
+CPS1985 |> as_tibble()
+CPS1988 |> as_tibble()
+CPSSW04 |> as_tibble()
+CPSSW3 |> as_tibble()
+CPSSW8 |> as_tibble()
+CPSSW9204 |> as_tibble()
+CPSSW9298 |> as_tibble()
+CPSSWEducation |> as_tibble()
+CartelStability |> as_tibble()
 ChinaIncome
-CigarettesB %>% rownames_to_column("state") %>% as_tibble()
-CigarettesSW %>% as_tibble()
-CollegeDistance %>% as_tibble()
+CigarettesB |>
+  tibble::rownames_to_column("state") |>
+  tibble::as_tibble()
+CigarettesSW |> as_tibble()
+CollegeDistance |> as_tibble()
 ConsumerGood
-CreditCard %>% as_tibble()
+CreditCard |> as_tibble()
 DJFranses
 DJIA8012
-DoctorVisits %>% as_tibble()
+DoctorVisits |> as_tibble()
 DutchAdvert
 DutchSales
-Electricity1955 %>% as_tibble()
-Electricity1970 %>% rownames_to_column() %>% as_tibble()
-EquationCitations %>% as_tibble()
-Equipment %>% rownames_to_column("state") %>% as_tibble()
-EuroEnergy %>% rownames_to_column("country") %>% as_tibble()
-Fatalities %>% as_tibble()
-Fertility %>% as_tibble()
-Fertility2 %>% as_tibble()
+Electricity1955 |> as_tibble()
+Electricity1970 |>
+  tibble::rownames_to_column() |>
+  tibble::as_tibble()
+EquationCitations |> as_tibble()
+Equipment |>
+  tibble::rownames_to_column("state") |>
+  tibble::as_tibble()
+EuroEnergy |>
+  tibble::rownames_to_column("country") |>
+  tibble::as_tibble()
+Fatalities |> as_tibble()
+Fertility |> as_tibble()
+Fertility2 |> as_tibble()
 FrozenJuice
-GSOEP9402 %>% as_tibble()
-GSS7402 %>% as_tibble()
+GSOEP9402 |> as_tibble()
+GSS7402 |> as_tibble()
 GermanUnemployment
 GoldSilver
-GrowthDJ %>% as_tibble()
-GrowthSW %>% rownames_to_column("country") %>% as_tibble()
-Grunfeld %>% as_tibble()
-Guns %>% as_tibble()
-HMDA %>% as_tibble()
-HealthInsurance %>% as_tibble()
-HousePrices %>% as_tibble()
-Journals %>% rownames_to_column("abbrev") %>% as_tibble()
+GrowthDJ |> as_tibble()
+GrowthSW |>
+  tibble::rownames_to_column("country") |>
+  tibble::as_tibble()
+Grunfeld |> as_tibble()
+Guns |> as_tibble()
+HMDA |> as_tibble()
+HealthInsurance |> as_tibble()
+HousePrices |> as_tibble()
+Journals |>
+  tibble::rownames_to_column("abbrev") |>
+  tibble::as_tibble()
 KleinI
 Longley
-MASchools %>% as_tibble()
+MASchools |> as_tibble()
 MSCISwitzerland
 ManufactCosts
 MarkDollar
 MarkPound
-Medicaid1986 %>% as_tibble()
-Mortgage %>% as_tibble()
+Medicaid1986 |> as_tibble()
+Mortgage |> as_tibble()
 MotorCycles
 MotorCycles2
-Municipalities %>% as_tibble()
-MurderRates %>% as_tibble()
-NMES1988 %>% as_tibble()
+Municipalities |> as_tibble()
+MurderRates |> as_tibble()
+NMES1988 |> as_tibble()
 NYSESW
-NaturalGas %>% as_tibble()
-OECDGas %>% as_tibble()
-OECDGrowth %>% rownames_to_column("country") %>% as_tibble()
-OlympicTV %>% rownames_to_column("city") %>% as_tibble()
+NaturalGas |> as_tibble()
+OECDGas |> as_tibble()
+OECDGrowth |>
+  tibble::rownames_to_column("country") |>
+  tibble::as_tibble()
+OlympicTV |>
+  tibble::rownames_to_column("city") |>
+  tibble::as_tibble()
 OrangeCounty
-PSID1976 %>% as_tibble()
-PSID1982 %>% as_tibble()
-PSID7682 %>% as_tibble()
-Parade2005 %>% as_tibble()
+PSID1976 |> as_tibble()
+PSID1982 |> as_tibble()
+PSID7682 |> as_tibble()
+Parade2005 |> as_tibble()
 PepperPrice
-PhDPublications %>% as_tibble()
-ProgramEffectiveness %>% as_tibble()
-RecreationDemand %>% as_tibble()
-ResumeNames %>% as_tibble()
-SIC33 %>% as_tibble()
-STAR %>% as_tibble()
-ShipAccidents %>% as_tibble()
-SmokeBan %>% as_tibble()
-SportsCards %>% as_tibble()
-StrikeDuration %>% as_tibble()
-SwissLabor %>% as_tibble()
-TeachingRatings %>% as_tibble()
+PhDPublications |> as_tibble()
+ProgramEffectiveness |> as_tibble()
+RecreationDemand |> as_tibble()
+ResumeNames |> as_tibble()
+SIC33 |> as_tibble()
+STAR |> as_tibble()
+ShipAccidents |> as_tibble()
+SmokeBan |> as_tibble()
+SportsCards |> as_tibble()
+StrikeDuration |> as_tibble()
+SwissLabor |> as_tibble()
+TeachingRatings |> as_tibble()
 TechChange
 TradeCredit
-TravelMode %>% as_tibble()
+TravelMode |> as_tibble()
 UKInflation
 UKNonDurables
-USAirlines %>% as_tibble()
+USAirlines |> as_tibble()
 USConsump1950
 USConsump1979
 USConsump1993
-USCrudes %>% as_tibble()
+USCrudes |> as_tibble()
 USGasB
 USGasG
 USInvest
@@ -357,49 +385,84 @@ USMacroSWM
 USMacroSWQ
 USMoney
 USProdIndex
-USSeatBelts %>% as_tibble()
+USSeatBelts |> as_tibble()
 USStocksSW
-WeakInstrument %>% as_tibble()
+WeakInstrument |> as_tibble()
 
 
 # #######1#########2#########3#########4#########5#########6#########7#########
 # install.packages("COUNT")
 library(COUNT)
-data_COUNT = data(package = "COUNT")[["results"]] %>%
-  as_tibble() %>%
-  dplyr::select(!LibPath) %>%
+data_COUNT = data(package = "COUNT")[["results"]] |>
+  tibble::as_tibble() |>
+  dplyr::select(!LibPath) |>
   print()
 data(list = data_COUNT[["Item"]], package = "COUNT")
 
-affairs %>% as_tibble()
-azcabgptca %>% as_tibble()
-azdrg112 %>% as_tibble()
-azpro %>% as_tibble()
-azprocedure %>% as_tibble()
+affairs |> as_tibble()
+azcabgptca |> as_tibble()
+azdrg112 |> as_tibble()
+azpro |> as_tibble()
+azprocedure |> as_tibble()
 
-badhealth %>% as_tibble() %>%
+badhealth |>
+  tibble::as_tibble() |>
   ggplot() +
   aes(numvisit, badh) +
   geom_jitter(aes(color = age), height = 0.2, width = 0, alpha = 0.5) +
   stat_smooth(formula = y ~ x, method = glm, method.args = list(family = binomial))
 
-fasttrakg %>% as_tibble()
-fishing %>% as_tibble()
-lbw %>% as_tibble()
-lbwgrp %>% as_tibble()
-loomis %>% as_tibble()
-mdvis %>% as_tibble() %>% plot()
-medpar %>% as_tibble()
-nuts %>% as_tibble()
-rwm %>% as_tibble() %>% plot()
-rwm1984 %>% as_tibble()
-rwm5yr %>% as_tibble()
-ships %>% as_tibble()
-smoking %>% as_tibble()
-titanic %>% as_tibble()
-titanicgrp %>% as_tibble()
+fasttrakg |> as_tibble()
+fishing |> as_tibble()
+lbw |> as_tibble()
+lbwgrp |> as_tibble()
+loomis |> as_tibble()
+mdvis |> as_tibble() |> plot()
+medpar |> as_tibble()
+nuts |> as_tibble()
+rwm |> as_tibble() |> plot()
+rwm1984 |> as_tibble()
+rwm5yr |> as_tibble()
+ships |> as_tibble()
+smoking |> as_tibble()
+titanic |> as_tibble()
+titanicgrp |> as_tibble()
 
-MASS::ships %>% as_tibble() %>%
+MASS::ships |>
+  tibble::as_tibble() |>
   ggplot() +
   aes(log10(service), incidents) +
   geom_point(aes(color = type), alpha = 0.6)
+
+
+construction
+
+who_tidy = who |>
+  dplyr::filter(iso2 %in% c("JP", "FI", "DE")) |>
+  tidyr::pivot_longer(matches("^new")) |>
+  tidyr::drop_na() |>
+  dplyr::mutate(name = stringr::str_remove(name, "^new_?")) |>
+  tidyr::separate(name, c("diagnosis", "name")) |>
+  tidyr::separate(name, c("sex", "age"), 1L) |>
+  dplyr::mutate(age = stringr::str_replace(age, "(\\d5|0)", "\\1-")) |>
+  print()
+
+ggplot(who_tidy) +
+  aes(year, value) +
+  geom_line(aes(color = age, linetype = sex)) +
+  facet_grid(vars(country), vars(diagnosis))
+
+billboard |>
+  dplyr::filter(if_any(matches("^wk"), \(x) x == 1)) |>
+  tidyr::pivot_longer(matches("^wk"), names_to = "week", values_to = "rank") |>
+  tidyr::drop_na() |>
+  dplyr::mutate(week = readr::parse_number(week)) |>
+  ggplot() +
+  aes(week, rank, group = track) +
+  geom_line(aes(color = track)) +
+  scale_y_reverse()
+
+billboard |>
+  dplyr::count(artist) |>
+  dplyr::arrange(desc(n)) |>
+  dplyr::filter(n > 1L)
