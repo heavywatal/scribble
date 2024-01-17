@@ -1,5 +1,6 @@
 #!/usr/bin/env Rscript
-#$ -S /opt/pkg/r/3.5.2/bin/Rscript
+
+#$ -S /usr/bin/Rscript
 #$ -l short
 #$ -cwd
 

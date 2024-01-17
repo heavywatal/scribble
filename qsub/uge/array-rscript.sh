@@ -1,7 +1,9 @@
 #!/bin/bash
-#$ -S /bin/sh
+
+#$ -S /bin/bash
 #$ -l short
-#$ -l s_vmem=2G,mem_req=2G
+#$ -l s_vmem=2G
+#$ -l mem_req=2G
 #$ -pe def_slot 2
 #$ -t 1-2
 #$ -cwd
@@ -20,5 +22,4 @@ echo SGE_TASK_STEPSIZE: $SGE_TASK_STEPSIZE
 INFILE=mydata-${SGE_TASK_ID}.tsv
 SCRIPT=envvars.R
 
-module load r/3.5.2
 Rscript $SCRIPT $INFILE
