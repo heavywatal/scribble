@@ -1,13 +1,14 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.15)
 project(scribble CXX)
 
+include(CMakePrintHelpers)
 include(GNUInstallDirs)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 if (NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
-message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+cmake_print_variables(CMAKE_BUILD_TYPE)
 set(CMAKE_CXX_FLAGS_DEV "-O2 -g")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -19,7 +20,7 @@ include(WarningFlagsCXX OPTIONAL)
 
 set(Boost_NO_BOOST_CMAKE ON)
 find_package(Boost COMPONENTS context)
-message(STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
+cmake_print_variables(Boost_INCLUDE_DIRS)
 
 find_package(Threads)
 find_package(wtl)
@@ -48,12 +49,12 @@ if(toml11_FOUND)
   target_link_libraries(toml PRIVATE toml11::toml11)
 endif()
 
-message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
-message(STATUS "CMAKE_CXX_FLAGS_DEBUG: ${CMAKE_CXX_FLAGS_DEBUG}")
-message(STATUS "CMAKE_CXX_FLAGS_RELWITHDEBINFO: ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
-message(STATUS "CMAKE_CXX_FLAGS_MINSIZEREL: ${CMAKE_CXX_FLAGS_MINSIZEREL}")
-message(STATUS "CMAKE_CXX_FLAGS_RELEASE: ${CMAKE_CXX_FLAGS_RELEASE}")
-message(STATUS "CMAKE_CXX_FLAGS_DEV: ${CMAKE_CXX_FLAGS_DEV}")
+cmake_print_variables(CMAKE_CXX_FLAGS)
+cmake_print_variables(CMAKE_CXX_FLAGS_DEBUG)
+cmake_print_variables(CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+cmake_print_variables(CMAKE_CXX_FLAGS_MINSIZEREL)
+cmake_print_variables(CMAKE_CXX_FLAGS_RELEASE)
+cmake_print_variables(CMAKE_CXX_FLAGS_DEV)
 
 install(TARGETS sizeof
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
