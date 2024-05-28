@@ -1,3 +1,6 @@
+.cache
+*_cache
+*_files
 *.html
 *.md
 *.pdf

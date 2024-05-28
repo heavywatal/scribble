@@ -1,0 +1,38 @@
+---
+title: "Test autodep"
+author: "heavywatal"
+format:
+  html:
+    theme: none
+    minimal: true
+---
+
+```r
+wtl::install_packages("knitr")
+wtl::install_packages("yihui/knitr@v1.45", binary=FALSE)
+wtl::install_packages("yihui/knitr@v1.46", binary=FALSE)
+wtl::install_packages("yihui/knitr", binary=FALSE)
+```
+
+```{r, setup}
+knitr::opts_chunk$set(cache = TRUE)
+knitr::opts_chunk$set(autodep = TRUE)
+```
+
+```{r, src}
+x = 1
+```
+
+---
+
+```{r, dst}
+y = 10 * x
+y
+```
+
+```{r, dst2}
+#| cache-globals:
+#| - x
+z = 100 * x
+z
+```
