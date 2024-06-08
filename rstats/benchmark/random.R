@@ -10,3 +10,25 @@ bench::mark(
   stats::rpois(n, 1000),
   check = FALSE
 )
+
+# #######1#########2#########3#########4#########5#########6#########7#########
+# clustering
+
+loadNamespace("ClusterR")
+
+runif_int = function(n = 1L, replace = TRUE) {
+  sample.int(.Machine$integer.max, n, replace = replace)
+}
+runif_int(8L)
+
+tbl = diamonds |> dplyr::select(carat, depth, price)
+k = 6L
+niter = 2L
+
+bench::mark(
+  stats::kmeans(tbl, k, iter.max = niter),
+  ClusterR::MiniBatchKmeans(tbl, k, max_iters = niter, seed = runif_int()),
+  ClusterR::KMeans_arma(tbl, k, n_iter = niter, seed = runif_int()),
+  ClusterR::KMeans_rcpp(tbl, k, max_iters = niter, seed = runif_int()),
+  check = FALSE
+)
