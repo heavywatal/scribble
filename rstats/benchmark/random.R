@@ -32,3 +32,16 @@ bench::mark(
   ClusterR::KMeans_rcpp(tbl, k, max_iters = niter, seed = runif_int()),
   check = FALSE
 )
+
+loadNamespace("fastkmedoids")
+
+small = tbl |> dplyr::sample_n(2000)
+
+bench::mark(
+  stats::kmeans(tbl, k, iter.max = niter),
+  cluster::pam(small, k, diss = FALSE, cluster.only = TRUE, do.swap = FALSE, variant = "faster"),
+  fastkmedoids::fastpam(dist(small), nrow(small), k, seed = runif_int()),
+  fastkmedoids::fastclara(dist(small), nrow(small), k, seed = runif_int()),
+  fastkmedoids::fastclarans(dist(small), nrow(small), k, seed = runif_int()),
+  check = FALSE
+)
