@@ -1,14 +1,14 @@
 library(tidyverse)
 
 make_table = function(name, front, rear) {
-  .front = tibble(front) %>% rownames_to_column("x")
-  .rear = tibble(rear) %>% rownames_to_column("y")
+  .front = data.frame(front) |> tibble::rownames_to_column("x")
+  .rear = data.frame(rear) |> tibble::rownames_to_column("y")
   tidyr::crossing(
     name,
     front = .front$front,
     rear = .rear$rear
-  ) %>%
-    dplyr::left_join(.front, by = "front") %>%
+  ) |>
+    dplyr::left_join(.front, by = "front") |>
     dplyr::left_join(.rear, by = "rear")
 }
 
@@ -25,11 +25,11 @@ gear_df = dplyr::bind_rows(
   make_table("Zektor 2", c(50, 34), c(11, 13, 15, 18, 21, 24, 28, 32)),
   make_table("Zektor 3", c(48, 32), c(11, 13, 15, 17, 20, 23, 26, 30, 34)),
   make_table("VR60", c(48, 32), c(12, 14, 16, 18, 21, 24, 28, 32))
-) %>%
-  dplyr::mutate(ratio = front / rear) %>%
+) |>
+  dplyr::mutate(ratio = front / rear) |>
   print()
 
-.pg = gear_df %>%
+.pg = gear_df |>
   ggplot(aes(ordered(x, levels = 3:1), ordered(y, levels = 11:1))) +
   geom_raster(aes(fill = ratio)) +
   geom_text(aes(label = sprintf("%.2f", ratio))) +
@@ -48,13 +48,13 @@ ggsave("bicycle-gear.png", .pg, width = 7, height = 4)
 
 speed_df = tibble::tibble(
   rpm = c(60, 70, 76.8, 80, 90),
-  gear = list(gear_df %>% dplyr::filter(name == "Zektor 3"))
-) %>%
-  tidyr::unnest() %>%
-  dplyr::mutate(speed = speed(ratio, rpm)) %>%
+  gear = list(gear_df |> dplyr::filter(name == "Zektor 3"))
+) |>
+  tidyr::unnest(gear) |>
+  dplyr::mutate(speed = speed(ratio, rpm)) |>
   print()
 
-.ps = speed_df %>%
+.ps = speed_df |>
   ggplot(aes(ordered(x, levels = 2:1), ordered(y, levels = 10:1))) +
   geom_raster(aes(fill = speed)) +
   geom_text(aes(label = sprintf("%.1f", speed))) +
