@@ -42,6 +42,15 @@ cannot_compile(cpp11::writable::data_frame df) {
 # error: no member named 'reserve' in 'cpp11::writable::data_frame'
 # error: no member named 'push_back' in 'cpp11::writable::data_frame'
 
+# this kind of operation is safe for list, but not for data_frame:
+cpp11::cpp_function('cpp11::data_frame
+mutate1(cpp11::data_frame df) {
+  SET_VECTOR_ELT(cpp11::as_sexp(df), 1, cpp11::as_sexp(999));
+  return df;
+}
+')
+data.frame(a = 1L, b = 2L) |> mutate1()
+
 # receive and modify as list, and return as data_frame
 cpp11::cpp_function('cpp11::data_frame
 add_col(cpp11::writable::list df_as_list) {
