@@ -16,6 +16,8 @@ bench::mark(
   seq_len11(n),
   seq_len11static(n),
   seq_len11protect(n),
+  seq_len11rownames(n),
+  seq_len11rownames_static(n),
   seq_len11stl(n),
   seq_lenRcpp(n)
 )
