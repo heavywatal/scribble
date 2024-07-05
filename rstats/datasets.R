@@ -237,6 +237,23 @@ ggplot(diamonds) +
     axis.text = element_blank(), axis.ticks = element_blank()
   )
 
+gp = ggplot(diamonds) +
+  geom_point(shape = 16, alpha = 0.33) +
+  coord_fixed(xlim = c(0, 60), ylim = c(0, 60)) +
+  theme_minimal(13) +
+  theme(legend.position = "none")
+xy = gp + aes(x, y)
+yz = gp + aes(y, z)
+zx = gp + aes(z, x)
+cowplot::plot_grid(xy, yz, zx)
+
+diamonds |>
+  dplyr::mutate(depth_xyz = 200 * z / (x + y)) |>
+  ggplot() +
+  aes(depth, depth_xyz) +
+  geom_point(shape = 16, alpha = 0.33)
+
+
 seals |>
   dplyr::mutate(v = sqrt(delta_lat**2 + delta_long**2)) |>
   ggplot() +
