@@ -45,3 +45,18 @@ bench::mark(
   fastkmedoids::fastclarans(dist(small), nrow(small), k, seed = runif_int()),
   check = FALSE
 )
+
+# #######1#########2#########3#########4#########5#########6#########7#########
+# which is the lowest cost function (to discard and advance rng state)?
+
+n = 1L
+bench::mark(
+  runif(n),
+  rbinom(n, 1L, 0.5),
+  rexp(n, 1e-6),
+  rgeom(n, 1e-6),
+  rpois(n, 1e-6),
+  rnorm(n, 0, 1e-6),
+  sample.int(n),
+  check = FALSE
+)
