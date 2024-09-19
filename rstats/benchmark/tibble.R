@@ -9,6 +9,14 @@ tibble::as_tibble(t(vec))
 # #######1#########2#########3#########4#########5#########6#########7#########
 
 bench::mark(
+  "price" %in% names(diamonds),
+  any("price" == names(diamonds)),
+  !is.null(diamonds[["price"]])
+)
+
+# #######1#########2#########3#########4#########5#########6#########7#########
+
+bench::mark(
   pillar = wtl::redirect(pillar:::print.tbl(ggplot2::diamonds)),
   data.table = wtl::redirect(data.table:::print.data.table(ggplot2::diamonds)),
   wtl = wtl::redirect(wtl:::printdf(ggplot2::diamonds))
