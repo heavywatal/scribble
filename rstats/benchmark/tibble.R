@@ -1,4 +1,4 @@
-library(conflicted)
+library(conflicted) # nolint: unused_import_linter.
 library(tidyverse)
 
 # convert to 1-row tibble
@@ -9,6 +9,7 @@ tibble::as_tibble(t(vec))
 # #######1#########2#########3#########4#########5#########6#########7#########
 
 bench::mark(
+  utils::hasName(diamonds, "price"),
   "price" %in% names(diamonds),
   any("price" == names(diamonds)),
   !is.null(diamonds[["price"]])
@@ -38,7 +39,7 @@ bench::mark(
   Reduce = Reduce(`+`, df),
   reduce = purrr::reduce(df, `+`),
   rowSums = rowSums(df),
-  apply = apply(df, 1, sum),
+  apply = apply(df, 1, sum), # nolint: matrix_apply_linter.
   "for" = forloop(df, `+`)
 )
 
