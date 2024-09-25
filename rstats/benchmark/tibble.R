@@ -8,11 +8,19 @@ tibble::as_tibble(t(vec))
 
 # #######1#########2#########3#########4#########5#########6#########7#########
 
+any_equal_names = function(x, name) any(name == names(x))
+x = diamonds
+name = "price"
+
 bench::mark(
-  utils::hasName(diamonds, "price"),
-  "price" %in% names(diamonds),
-  any("price" == names(diamonds)),
-  !is.null(diamonds[["price"]])
+  rlang::has_name(x, name),
+  utils::hasName(x, name),
+  name %in% names(x),
+  match(name, names(x), nomatch = 0L) > 0L,
+  !is.na(match(name, names(x))),
+  any(name == names(x)),
+  any_equal_names(x, name),
+  !is.null(x[[name]])
 )
 
 # #######1#########2#########3#########4#########5#########6#########7#########
