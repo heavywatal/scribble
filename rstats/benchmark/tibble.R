@@ -8,6 +8,38 @@ tibble::as_tibble(t(vec))
 
 # #######1#########2#########3#########4#########5#########6#########7#########
 
+bench::mark(
+  bracket1 = mpg[, "cty", drop = TRUE],
+  bracket2 = mpg[["cty"]],
+  dollar = mpg$cty,
+  pull = dplyr::pull(mpg, "cty"),
+  with = with(mpg, cty)
+)
+
+bangbang_fun = function(d, name) {
+  d |> dplyr::summarize(x = length(!!as.name(name)), .by = price)
+}
+
+bangbang_enquo = function(d, name) {
+  name = enquo(name)
+  d |> dplyr::summarize(x = length(!!name), .by = price)
+}
+
+enquo_bracket = function(d, name) {
+  d |> dplyr::summarize(x = length({{ name }}), .by = price)
+}
+
+bench::mark(
+  bracket = dplyr::summarize(diamonds, x = length(.data[["carat"]]), .by = price),
+  dollar = dplyr::summarize(diamonds, x = length(.data$carat), .by = price),
+  bangbang = dplyr::summarize(diamonds, x = length(!!as.name("carat")), .by = price),
+  bang_fun = bangbang_fun(diamonds, "carat"),
+  enquo = bangbang_enquo(diamonds, carat),
+  embrace = enquo_bracket(diamonds, carat)
+)
+
+# #######1#########2#########3#########4#########5#########6#########7#########
+
 any_equal_names = function(x, name) any(name == names(x))
 x = diamonds
 name = "price"
@@ -61,6 +93,6 @@ df |>
 
 mtcars_csv = readr::readr_example("mtcars.csv") |> rep(20)
 bench::mark(
-  readr::read_tsv(mtcars_csv)[],
-  purrr::map(mtcars_csv, read_tsv) |> purrr::list_rbind()
+  readr::read_csv(mtcars_csv)[],
+  purrr::map(mtcars_csv, read_csv) |> purrr::list_rbind()
 )
