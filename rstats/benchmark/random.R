@@ -49,6 +49,13 @@ bench::mark(
 # #######1#########2#########3#########4#########5#########6#########7#########
 # which is the lowest cost function (to discard and advance rng state)?
 
+next_rng_stream = function() {
+  next_seed = parallel::nextRNGStream(.Random.seed)
+  assign(".Random.seed", next_seed, pos = .GlobalEnv)
+}
+
+RNGkind("L'Ecuyer-CMRG")
+
 n = 1L
 bench::mark(
   runif(n),
@@ -58,5 +65,6 @@ bench::mark(
   rpois(n, 1e-6),
   rnorm(n, 0, 1e-6),
   sample.int(n),
+  next_rng_stream(),
   check = FALSE
 )
