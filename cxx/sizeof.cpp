@@ -31,6 +31,9 @@ inline void primitive() {
     std::cout << "intptr_t      " << sizeof(intptr_t) << "\n";
     std::cout << "ptrdiff_t     " << sizeof(ptrdiff_t) << "\n";
     std::cout << "size_t        " << sizeof(size_t) << "\n";
+#ifdef __SIZEOF_INT128__
+    std::cout << "__uint128_t   " << sizeof(__uint128_t) << "\n";
+#endif
 }
 
 inline void container() {

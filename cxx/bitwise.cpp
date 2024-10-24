@@ -1,17 +1,64 @@
 #include <cstdint>
 #include <iostream>
 
+template <class T> inline
+constexpr T urotl(T x, unsigned s) noexcept {
+    constexpr unsigned dig = std::numeric_limits<T>::digits;
+    return (x << (s % dig)) | (x >> ((-s) % dig));
+}
+
+template <class T> inline
+constexpr T urotr(T x, unsigned s) noexcept {
+    constexpr unsigned dig = std::numeric_limits<T>::digits;
+    return (x >> (s % dig)) | (x << ((-s) % dig));
+}
+
+template <class T> inline
+constexpr T rotr(T x, int s) noexcept {
+    constexpr unsigned dig = std::numeric_limits<T>::digits;
+    if (s == 0)
+      return x;
+    if (s < 0) {
+      return (x << ((-s) % dig)) | (x >> (s % dig));
+    }
+    return (x >> (s % dig)) | (x << ((-s) % dig));
+}
+
+template <class T> inline
+constexpr T rotl(T x, int s) noexcept {
+    return rotr(x, -s);
+}
+
+inline void rotate() {
+    constexpr uint32_t u32 = 0b10100000'00000000'00000000'00000101u;
+    static_assert(u32 % 8u == (u32 & 7u), "");
+    static_assert(urotr(u32,  1u) == 0b11010000'00000000'00000000'00000010u, "");
+    static_assert(urotr(u32,  2u) == 0b01101000'00000000'00000000'00000001u, "");
+    static_assert(urotr(u32,  0u) == u32, "");
+    static_assert(urotr(u32, 32u) == u32, "");
+    static_assert(urotr(u32, -1 ) == 0b01000000'00000000'00000000'00001011u, "");
+    static_assert(urotr(u32, -2 ) == 0b1000000'00000000'00000000'000010110u, "");
+    static_assert( rotr(u32,  1 ) == 0b11010000'00000000'00000000'00000010u, "");
+    static_assert( rotr(u32,  2 ) == 0b011010000'00000000'00000000'0000001u, "");
+    static_assert( rotr(u32,  0 ) == u32, "");
+    static_assert( rotr(u32, 32 ) == u32, "");
+    static_assert( rotr(u32, -1 ) == 0b01000000'00000000'00000000'00001011u, "");
+    static_assert( rotr(u32, -2 ) == 0b1000000'00000000'00000000'000010110u, "");
+}
+
 inline void uint_int() {
-    static_assert(uint8_t(0b00000000) ==    0u, "");
-    static_assert(uint8_t(0b10000000) ==  128u, "");
-    static_assert(uint8_t(0b11111111) ==  255u, "");
-    static_assert( int8_t(0b01111111) ==  127, "");
-    static_assert( int8_t(0b10000000) == -128, "");
-    static_assert( int8_t(0b10000001) == -127, "");
-    static_assert( int8_t(0b10000010) == -126, "");
-    static_assert( int8_t(0b11111101) ==   -3, "");
-    static_assert( int8_t(0b11111110) ==   -2, "");
-    static_assert( int8_t(0b11111111) ==   -1, "");
+    static_assert(       0b00000000u ==    0u, "");
+    static_assert(       0b10000000u ==  128u, "");
+    static_assert(       0b11111111u ==  255u, "");
+    static_assert(       0b01111111  ==  127, "");
+    static_assert(       0b10000000  ==  128, "");
+    static_assert(int8_t(0b10000000) == -128, "");
+    static_assert(int8_t(0b10000001) == -127, "");
+    static_assert(int8_t(0b10000010) == -126, "");
+    static_assert(int8_t(0b11111101) ==   -3, "");
+    static_assert(int8_t(0b11111110) ==   -2, "");
+    static_assert(int8_t(0b11111111) ==   -1, "");
+    static_assert(0b11111111u == uint8_t(-1u), "");
 }
 
 inline void operation() {
@@ -42,6 +89,7 @@ inline void right_shift() {
 }
 
 int main() {
+    rotate();
     uint_int();
     operation();
     right_shift();
