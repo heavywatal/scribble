@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <iostream>
+#include <limits>
 
 template <class T> inline
 constexpr T urotl(T x, unsigned s) noexcept {
@@ -71,8 +72,13 @@ inline void operation() {
     static_assert((u >> 1)    == 0b00000010, "");  //   2u
     static_assert(uint8_t(~u) == 0b11111010u, ""); // 250u
     static_assert(uint8_t(-u) == 0b11111011u, ""); // 251u
-    static_assert(       (~u) == 4294967290u, ""); // NOTE: implicit ~u is not 8-bit
-    static_assert(       (-u) == 4294967291u, ""); // NOTE: implicit -u is not 8-bit
+#ifdef __clang__
+    static_assert((~u) == 4294967290u, ""); // NOTE: unsigned, not 8-bit
+    static_assert((-u) == 4294967291u, ""); // NOTE: unsigned, not 8-bit
+#else
+    static_assert((~u) == -6 , ""); // NOTE: signed, not 8-bit
+    static_assert((-u) == -5 , ""); // NOTE: signed, not 8-bit
+#endif
     constexpr int8_t i = 5;
     static_assert((~i) == int8_t(0b11111010), ""); //  -6
     static_assert((-i) == int8_t(0b11111011), ""); //  -5
@@ -83,7 +89,11 @@ inline void operation() {
 
 inline void right_shift() {
     constexpr uint8_t u = 0b10000000;
+#ifdef __clang__
     constexpr int8_t  i = 0b10000000;
+#else
+    constexpr auto  i = static_cast<int8_t>(0b10000000);
+#endif
     static_assert((u >> 2) == uint8_t(0b00100000), "");
     static_assert((i >> 2) ==  int8_t(0b11100000), ""); // undefined?
 }
