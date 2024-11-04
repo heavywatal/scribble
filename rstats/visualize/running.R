@@ -1,6 +1,9 @@
-library(dplyr)
+loadNamespace(dplyr)
+loadNamespace(purrr)
+loadNamespace(tibble)
 
-df_seconds = tibble::tibble(pace = seq.int(180, 300, 5)) |>
+pace = c(seq.int(180, 360, 10), seq.int(245, 295, 10)) |> sort()
+df_seconds = tibble::tibble(pace) |>
   dplyr::mutate(km10 = pace * 10) |>
   dplyr::mutate(half = round(pace * 21.1)) |>
   dplyr::mutate(full = round(pace * 42.2)) |>
@@ -10,7 +13,7 @@ df_seconds = tibble::tibble(pace = seq.int(180, 300, 5)) |>
 
 library(hms)
 
-df_seconds |> dplyr::mutate(across(everything(), hms::hms))
+df_seconds |> purrr::modify(hms::hms)
 
 # #######1#########2#########3#########4#########5#########6#########7#########
 
@@ -24,5 +27,5 @@ format_hms = function(x) {
 }
 
 df_seconds |>
-  dplyr::mutate(across(everything(), lubridate::seconds_to_period)) |>
-  dplyr::mutate(across(everything(), format_hms))
+  purrr::modify(lubridate::seconds_to_period) |>
+  purrr::modify(format_hms)
