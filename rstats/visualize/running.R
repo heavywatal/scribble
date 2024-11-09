@@ -1,6 +1,7 @@
-loadNamespace(dplyr)
-loadNamespace(purrr)
-loadNamespace(tibble)
+loadNamespace("dplyr")
+loadNamespace("purrr")
+loadNamespace("tibble")
+options(tibble.print_max = 60L)
 
 pace = c(seq.int(180, 360, 10), seq.int(245, 295, 10)) |> sort()
 df_seconds = tibble::tibble(pace) |>
@@ -11,13 +12,13 @@ df_seconds = tibble::tibble(pace) |>
 
 # #######1#########2#########3#########4#########5#########6#########7#########
 
-library(hms)
+loadNamespace("hms")
 
 df_seconds |> purrr::modify(hms::hms)
 
 # #######1#########2#########3#########4#########5#########6#########7#########
 
-library(lubridate)
+loadNamespace("lubridate")
 
 format_hms = function(x) {
   h = lubridate::hour(x)
