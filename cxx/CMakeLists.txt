@@ -30,7 +30,7 @@ find_package(Boost COMPONENTS context)
 cmake_print_variables(Boost_INCLUDE_DIRS)
 
 find_package(Threads)
-find_package(wtl 0.9.1)
+find_package(wtl 0.10.0)
 find_package(sfmt)
 find_package(igraph 0.10.2)
 find_package(toml11)

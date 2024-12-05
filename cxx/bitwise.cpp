@@ -1,6 +1,6 @@
 #include <cstdint>
-#include <iostream>
 #include <limits>
+#include <stdexcept>
 
 template <class T> inline
 constexpr T urotl(T x, unsigned s) noexcept {
@@ -98,10 +98,47 @@ inline void right_shift() {
     static_assert((i >> 2) ==  int8_t(0b11100000), ""); // undefined?
 }
 
+inline void runtime_assert(bool cond) {
+   if (!cond) throw std::logic_error("");
+}
+
+union bits64_t {
+    uint64_t as_uint64_t;
+    uint32_t as_uint32_t[2];
+    double as_double;
+
+    bits64_t(uint64_t x): as_uint64_t{x} {}
+    bits64_t(uint32_t x, uint32_t y): as_uint32_t{x, y} {}
+
+    // Use only 52 bits
+    double as_canonical() const {
+        return bits64_t{as_uint64_t}.as_canonical_inplace().as_double;
+    }
+
+    constexpr bits64_t& as_canonical_inplace() {
+        as_uint64_t &= 0x3fff'ffff'ffff'ffffu;
+        as_uint64_t |= 0x3ff0'0000'0000'0000u;
+        as_double -= 1.0;
+        return *this;
+    }
+};
+
+inline void ieee754_double() {
+    bits64_t min_0x3ff{uint64_t{0x3ff0'0000'0000'0000u}}; // 1.0
+    bits64_t max_0x3ff{uint64_t{0x3fff'ffff'ffff'ffffu}}; // 1.999...
+    runtime_assert(min_0x3ff.as_double == 1.0);
+    runtime_assert(max_0x3ff.as_double < 2.0);
+    runtime_assert((min_0x3ff.as_double - 1.0) == 0.0);
+    runtime_assert((max_0x3ff.as_double - 1.0) < 1.0);
+    runtime_assert(bits64_t{0u}.as_canonical() == 0.0);
+    runtime_assert(bits64_t{~0u}.as_canonical() < 1.0);
+}
+
 int main() {
     rotate();
     uint_int();
     operation();
     right_shift();
+    ieee754_double();
     return 0;
 }
