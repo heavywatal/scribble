@@ -8,7 +8,7 @@ int main() {
     0, 1,
     0, 2
   };
-  igraph_vector_int_view(&v, edges, sizeof(edges) / sizeof(double));
+  igraph_vector_int_view(&v, edges, sizeof(edges) / sizeof(int));
   igraph_create(&graph, &v, 0, true);
 
   igraph_real_t res;
