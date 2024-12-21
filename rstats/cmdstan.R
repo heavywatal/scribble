@@ -1,5 +1,6 @@
-install.packages("cmdstanr", repos = "https://mc-stan.org/r-packages/")
-install.packages("bayesplot")
+pak::repo_add(stan = "https://mc-stan.org/r-packages/")
+wtl::install_packages("cmdstanr", binary = FALSE)
+wtl::install_packages("bayesplot")
 
 # #######1#########2#########3#########4#########5#########6#########7#########
 library(cmdstanr)
