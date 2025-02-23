@@ -17,9 +17,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_library(common INTERFACE)
 target_compile_features(common INTERFACE cxx_std_17)
 target_compile_options(common INTERFACE
-  -Wall -Wextra -pedantic
+  -Wall -Wextra -pedantic -Werror
   $<$<STREQUAL:${CMAKE_SYSTEM_PROCESSOR},x86_64>:-march=native>
-  $<$<STREQUAL:${CMAKE_SYSTEM_PROCESSOR},arm64>:-march=armv8.3-a+sha3>
+  $<$<STREQUAL:${CMAKE_SYSTEM_PROCESSOR},arm64>:-march=armv8.5-a>
 )
 target_link_libraries(common INTERFACE wtl::wtl)
 
@@ -27,7 +27,7 @@ set(CMAKE_MODULE_PATH "$ENV{HOME}/.cmake/packages")
 include(WarningFlagsCXX OPTIONAL)
 
 find_package(Boost COMPONENTS context)
-cmake_print_variables(Boost_INCLUDE_DIRS)
+cmake_print_variables(Boost_FOUND Boost_INCLUDE_DIRS)
 
 find_package(Threads)
 find_package(wtl 0.10.0)
@@ -38,6 +38,10 @@ find_package(pcg)
 find_package(pcglite 0.2.0)
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} source_files)
+if(Boost_FOUND)
+  aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/boost boost_src)
+  list(APPEND source_files ${boost_src})
+endif()
 if(NOT toml11_FOUND)
   list(REMOVE_ITEM source_files ${CMAKE_CURRENT_SOURCE_DIR}/toml.cpp)
 endif()
@@ -49,11 +53,13 @@ foreach(src IN LISTS source_files)
 endforeach()
 
 target_link_libraries(benchmark PRIVATE wtl::sfmt pcg::pcg pcglite::pcglite)
-target_link_libraries(boost_coroutine2 PRIVATE Boost::context)
-target_link_libraries(boost_graph PRIVATE Boost::boost)
-target_link_libraries(boost_math PRIVATE Boost::boost)
 target_link_libraries(concurrent PRIVATE Threads::Threads)
 target_link_libraries(igraph PRIVATE igraph::igraph)
+if(Boost_FOUND)
+  target_link_libraries(boost_coroutine2 PRIVATE Boost::context)
+  target_link_libraries(boost_graph PRIVATE Boost::boost)
+  target_link_libraries(boost_math PRIVATE Boost::boost)
+endif()
 if(toml11_FOUND)
   target_link_libraries(toml PRIVATE toml11::toml11)
 endif()
