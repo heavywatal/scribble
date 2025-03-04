@@ -1,3 +1,4 @@
+#!/bin/bash
 array=(a b c d e f)   # bash        | zsh
 echo ${array}         # a           | a b c d e f
 echo ${array[0]}      # a           |
@@ -13,8 +14,8 @@ echo ${array[@]:2}    # c d e f
 echo ${array[@]: -2}  # e f
 echo "======"
 for x in "${array[*]:3}"; do
-  echo $x
-done                  # d e f       | _c d e f
+  echo "$x"
+done                  # d e f
 for x in "${array[@]:3}"; do
-  echo $x
+  echo "$x"
 done

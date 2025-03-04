@@ -1,12 +1,13 @@
+#!/bin/sh
 string=abcdef
+echo ${string}             # abcdef
+echo ${#string}            # 6
 # ${parameter:offset}
 # ${parameter:offset:length}
-echo ${string}             # abcdef
 echo ${string:0:3}         # abc
 echo ${string:1:3}         # bcd
 echo ${string:2}           # cdef
 echo ${string: -2}         # ef
-echo ${#string}            # 6
 echo "======"
 FILEPATH=/root/dir/file.tar.gz
 echo ${FILEPATH##*/}       # file.tar.gz
