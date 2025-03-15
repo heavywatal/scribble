@@ -7,14 +7,19 @@ format:
     minimal: true
 ---
 
+- Submitted an issue [knitr#2344](https://github.com/yihui/knitr/issues/2344)
+- Fixed in [v1.49](https://github.com/yihui/knitr/releases/tag/v1.49)
+
 ```r
 wtl::install_packages("knitr")
 wtl::install_packages("yihui/knitr@v1.45", binary=FALSE)
 wtl::install_packages("yihui/knitr@v1.46", binary=FALSE)
-wtl::install_packages("yihui/knitr", binary=FALSE)
+wtl::install_packages("yihui/knitr@v1.49", binary=FALSE)
 ```
 
 ```{r, setup}
+#| cache: false
+knitr::opts_chunk$set(cache.path = ".cache/")
 knitr::opts_chunk$set(cache = TRUE)
 knitr::opts_chunk$set(autodep = TRUE)
 ```
@@ -26,6 +31,7 @@ x = 1
 ---
 
 ```{r, dst}
+Sys.sleep(0.5)
 y = 10 * x
 y
 ```
@@ -33,6 +39,7 @@ y
 ```{r, dst2}
 #| cache-globals:
 #| - x
+Sys.sleep(0.5)
 z = 100 * x
 z
 ```
