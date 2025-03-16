@@ -8,6 +8,9 @@ tibble::as_tibble(t(vec))
 
 # #######1#########2#########3#########4#########5#########6#########7#########
 
+stopifnot(is.null(mpg[["unknown"]]))
+suppressWarnings(stopifnot(is.null(mpg$unknown)))
+
 bench::mark(
   bracket1 = mpg[, "cty", drop = TRUE],
   bracket2 = mpg[["cty"]],
@@ -16,20 +19,31 @@ bench::mark(
   with = with(mpg, cty)
 )
 
+x = mpg$cty
+assign_bracket = \() {mpg[["new"]] = x}
+assign_dollar = \() {mpg$new = x}
+
+bench::mark(
+  assign_bracket(),
+  assign_dollar(),
+  check = TRUE
+)
+
 bangbang_fun = function(d, name) {
-  d |> dplyr::summarize(x = length(!!as.name(name)), .by = price)
+  dplyr::summarize(d, x = length(!!as.name(name)), .by = price)
 }
 
 bangbang_enquo = function(d, name) {
   name = enquo(name)
-  d |> dplyr::summarize(x = length(!!name), .by = price)
+  dplyr::summarize(d, x = length(!!name), .by = price)
 }
 
 enquo_bracket = function(d, name) {
-  d |> dplyr::summarize(x = length({{ name }}), .by = price)
+  dplyr::summarize(d, x = length({{ name }}), .by = price)
 }
 
 bench::mark(
+  name = dplyr::summarize(diamonds, x = length(carat), .by = price),
   bracket = dplyr::summarize(diamonds, x = length(.data[["carat"]]), .by = price),
   dollar = dplyr::summarize(diamonds, x = length(.data$carat), .by = price),
   bangbang = dplyr::summarize(diamonds, x = length(!!as.name("carat")), .by = price),
