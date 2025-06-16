@@ -17,9 +17,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_library(common INTERFACE)
 target_compile_features(common INTERFACE cxx_std_17)
 target_compile_options(common INTERFACE
-  -Wall -Wextra -pedantic -Werror
-  $<$<STREQUAL:${CMAKE_SYSTEM_PROCESSOR},x86_64>:-march=native>
-  $<$<STREQUAL:${CMAKE_SYSTEM_PROCESSOR},arm64>:-march=armv8.5-a>
+  -Wall -Wextra -pedantic -Werror -march=native
 )
 target_link_libraries(common INTERFACE wtl::wtl)
 
@@ -47,7 +45,7 @@ if(NOT toml11_FOUND)
 endif()
 
 foreach(src IN LISTS source_files)
-  get_filename_component(name_we ${src} NAME_WE)
+  cmake_path(GET src STEM name_we)
   add_executable(${name_we} ${src})
   target_link_libraries(${name_we} PRIVATE common)
 endforeach()
