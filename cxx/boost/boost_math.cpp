@@ -5,12 +5,12 @@
 namespace bmath = boost::math;
 
 inline double normal_cdf(const double x, const double mean, const double sd) {
-    if (sd == 0.0) {return 0.0;}
+    if (sd < 1e-38) {return 0.0;}
     return bmath::cdf(bmath::normal(mean, sd), x);
 }
 
 inline double normal_ccdf(const double x, const double mean, const double sd) {
-    if (sd == 0.0) {return 0.0;}
+    if (sd < 1e-38) {return 0.0;}
     return bmath::cdf(bmath::complement(bmath::normal(mean, sd), x));
 }
 

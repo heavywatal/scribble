@@ -102,6 +102,10 @@ inline void runtime_assert(bool cond) {
    if (!cond) throw std::logic_error("");
 }
 
+inline bool exact_equal(double x, double y) {
+    return !((x > y) || (x < y));
+}
+
 union bits64_t {
     uint64_t as_uint64_t;
     uint32_t as_uint32_t[2];
@@ -126,11 +130,11 @@ union bits64_t {
 inline void ieee754_double() {
     bits64_t min_0x3ff{uint64_t{0x3ff0'0000'0000'0000u}}; // 1.0
     bits64_t max_0x3ff{uint64_t{0x3fff'ffff'ffff'ffffu}}; // 1.999...
-    runtime_assert(min_0x3ff.as_double == 1.0);
+    runtime_assert(exact_equal(min_0x3ff.as_double, 1.0));
     runtime_assert(max_0x3ff.as_double < 2.0);
-    runtime_assert((min_0x3ff.as_double - 1.0) == 0.0);
+    runtime_assert(exact_equal(min_0x3ff.as_double - 1.0, 0.0));
     runtime_assert((max_0x3ff.as_double - 1.0) < 1.0);
-    runtime_assert(bits64_t{0u}.as_canonical() == 0.0);
+    runtime_assert(exact_equal(bits64_t{0u}.as_canonical(), 0.0));
     runtime_assert(bits64_t{~0u}.as_canonical() < 1.0);
 }
 

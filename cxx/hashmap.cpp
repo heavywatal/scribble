@@ -14,7 +14,7 @@ int main() {
     std::cout << "load_factor: " << dict.load_factor()
               << " / " << dict.max_load_factor() << std::endl;
     for (size_t i=0; i<1000u; ++i) {
-        dict.emplace(i, i * 0.1);
+        dict.emplace(i, static_cast<double>(i) * 0.1);
     }
     std::cout << "bucket_count: " << dict.bucket_count()
               << " / " << dict.max_bucket_count() << std::endl;
