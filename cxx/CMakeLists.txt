@@ -27,21 +27,25 @@ include(WarningFlagsCXX OPTIONAL)
 find_package(Boost COMPONENTS context)
 cmake_print_variables(Boost_FOUND Boost_INCLUDE_DIRS)
 
+include(FetchContent)
+FetchContent_Declare(
+  tomlplusplus
+  GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
+  GIT_TAG        v3.4.0
+)
+
+FetchContent_MakeAvailable(tomlplusplus)
 find_package(Threads)
 find_package(wtl 0.10.0)
 find_package(sfmt)
-find_package(igraph 0.10.2)
-find_package(toml11)
+find_package(igraph 0.10.16)
 find_package(pcg)
-find_package(pcglite 0.2.0)
+find_package(pcglite 0.2.1)
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} source_files)
 if(Boost_FOUND)
   aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/boost boost_src)
   list(APPEND source_files ${boost_src})
-endif()
-if(NOT toml11_FOUND)
-  list(REMOVE_ITEM source_files ${CMAKE_CURRENT_SOURCE_DIR}/toml.cpp)
 endif()
 
 foreach(src IN LISTS source_files)
@@ -53,13 +57,11 @@ endforeach()
 target_link_libraries(benchmark PRIVATE wtl::sfmt pcg::pcg pcglite::pcglite)
 target_link_libraries(concurrent PRIVATE Threads::Threads)
 target_link_libraries(igraph PRIVATE igraph::igraph)
+target_link_libraries(toml PRIVATE tomlplusplus::tomlplusplus)
 if(Boost_FOUND)
   target_link_libraries(boost_coroutine2 PRIVATE Boost::context)
   target_link_libraries(boost_graph PRIVATE Boost::boost)
   target_link_libraries(boost_math PRIVATE Boost::boost)
-endif()
-if(toml11_FOUND)
-  target_link_libraries(toml PRIVATE toml11::toml11)
 endif()
 
 cmake_print_variables(CMAKE_CXX_FLAGS_DEBUG)
