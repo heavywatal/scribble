@@ -74,7 +74,7 @@ static_assert( std::is_trivial<int*>{}, "");
 static_assert(!std::is_trivial<int&>{}, "");
 static_assert(!std::is_trivial<std::vector<int>>{}, "");
 
-// has no non-traivial member && has trivial default ctor/dtor
+// has no non-trivial member && has trivial default ctor/dtor
 static_assert( std::is_trivially_default_constructible<Empty>{}, "");
 static_assert( std::is_trivially_default_constructible<DefaultCtorDefault>{}, "");
 static_assert( std::is_trivially_default_constructible<DefaultCtorDefaultPlus>{}, "");

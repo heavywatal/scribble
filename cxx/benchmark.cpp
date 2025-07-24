@@ -8,8 +8,6 @@
 
 #include <sfmt.hpp>
 
-#include <functional>
-
 inline void random_uint32() {
     pcglite::pcg32 rng32{};
     pcglite::pcg64 rng64{};
@@ -42,22 +40,22 @@ inline void random_canonical() {
         for (size_t i=0; i<n; ++i) {
             trash += wtl::generate_canonical(rng64);
         }
-    }, 3u) << "\t""wtl::generate_cannonical(gen64)""\t" << trash << std::endl;
+    }, 5u) << "\t""wtl::generate_canonical(gen64)""\t" << trash << std::endl;
     std::cout << wtl::diff_rusage([&](){
         for (size_t i=0; i<n; ++i) {
             trash += wtl::generate_canonical(rng32);
         }
-    }, 3u) << "\t""wtl::generate_cannonical(gen32)""\t" << trash << std::endl;
+    }, 5u) << "\t""wtl::generate_canonical(gen32)""\t" << trash << std::endl;
     std::cout << wtl::diff_rusage([&](){
         for (size_t i=0; i<n; ++i) {
             trash += std::generate_canonical<double, std::numeric_limits<double>::digits>(rng64);
         }
-    }, 3u) << "\t""std::generate_cannonical<>(gen64)""\t" << trash << std::endl;
+    }, 5u) << "\t""std::generate_canonical<>(gen64)""\t" << trash << std::endl;
     std::cout << wtl::diff_rusage([&](){
         for (size_t i=0; i<n; ++i) {
             trash += std::generate_canonical<double, std::numeric_limits<double>::digits>(rng32);
         }
-    }, 3u) << "\t""std::generate_cannonical<>(gen32)""\t" << trash << std::endl;
+    }, 5u) << "\t""std::generate_canonical<>(gen32)""\t" << trash << std::endl;
 }
 
 inline void random_sample() {
