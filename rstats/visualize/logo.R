@@ -3,19 +3,21 @@ library(tidyverse)
 dev.off()
 scale = 4
 quartz(width = scale * sqrt(3) / 2, height = scale)
-radius = 50
+radius = 54
 ylim = c(-radius, radius)
 xlim = ylim * sqrt(3) / 2
 hex_tekkamaki = ggplot() +
-  wtl::annotate_regpolygon(6L, radius, linewidth = 6, color = "#333333", fill = "#ffffff") +
-  wtl::annotate_regpolygon(6L, radius * 2 / 5, fill = "#C41A41") +
-  scale_x_continuous(expand = expansion(mult = 0.03)) +
-  scale_y_continuous(expand = expansion(mult = 0.03)) +
-  coord_fixed(xlim = xlim, ylim = ylim) +
+  # wtl::annotate_regpolygon(6L, radius, linewidth = 6, color = "#333333", fill = "#ffffff") +
+  wtl::annotate_regpolygon(6L, radius, fill = "#303030", linetype = 0) +
+  wtl::annotate_regpolygon(6L, radius - 6, fill = "#ffffff", linetype = 0) +
+  wtl::annotate_regpolygon(6L, radius * 2 / 5, fill = "#C41A41", linetype = 0) +
+  coord_fixed(xlim = xlim, ylim = ylim, expand = FALSE) +
   theme_void()
 hex_tekkamaki
-ggsave("hex-tekkamaki.svg", hex_tekkamaki, height = scale, width = scale * sqrt(3) / 2, dpi = 300, bg = "transparent")
-ggsave("hex-tekkamaki.png", hex_tekkamaki, height = scale, width = scale * sqrt(3) / 2, dpi = 300, bg = "transparent")
+ggsave("hex-tekkamaki.svg", hex_tekkamaki, height = 1.5, width = 1.5 * sqrt(3) / 2, bg = "transparent") |>
+  wtl::logo_svg_optimize()
+ggsave("hex-tekkamaki.png", hex_tekkamaki, height = scale, width = scale * sqrt(3) / 2, dpi = 128, bg = "transparent") |>
+  wtl::oxipng()
 
 # #######1#########2#########3#########4#########5#########6#########7#########
 
