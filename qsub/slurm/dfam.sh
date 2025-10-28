@@ -1,0 +1,43 @@
+#!/bin/bash
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=4G
+#SBATCH --array=0-16
+date -Iseconds
+echo "$(hostname):$(pwd)"
+echo "PATH: $PATH"
+
+echo "Hello, Slurm job array!"
+echo "=================================="
+echo "SLURMD_NODENAME: $SLURMD_NODENAME"
+echo "SLURM_SUBMIT_DIR: $SLURM_SUBMIT_DIR"
+echo "SLURM_JOB_ID: $SLURM_JOB_ID"
+echo "SLURM_JOB_NAME: $SLURM_JOB_NAME"
+echo "SLURM_JOB_START_TIME: $SLURM_JOB_START_TIME"
+echo "SLURM_JOB_END_TIME: $SLURM_JOB_END_TIME"
+echo "SLURM_JOB_CPUS_PER_NODE: $SLURM_JOB_CPUS_PER_NODE"
+echo "SLURM_CPUS_PER_TASK: $SLURM_CPUS_PER_TASK"
+echo "SLURM_MEM_PER_CPU: $SLURM_MEM_PER_CPU"
+echo "SLURM_MEM_PER_NODE: $SLURM_MEM_PER_NODE"
+echo "=================================="
+echo "SLURM_ARRAY_JOB_ID: $SLURM_ARRAY_JOB_ID"
+echo "SLURM_ARRAY_TASK_ID: $SLURM_ARRAY_TASK_ID"
+echo "SLURM_ARRAY_TASK_COUNT: $SLURM_ARRAY_TASK_COUNT"
+echo "=================================="
+
+set -eu
+
+PREFIX="/home/local/db/dfam.org"
+VER_MAJOR="3"
+VER_MINOR="9"
+PARTITION="$SLURM_ARRAY_TASK_ID"
+FILE="dfam${VER_MAJOR}${VER_MINOR}_full.${PARTITION}.h5.gz"
+RELPATH="releases/Dfam_${VER_MAJOR}.${VER_MINOR}/families/FamDB"
+URL="https://www.dfam.org/${RELPATH}/${FILE}"
+
+set -x
+
+mkdir -p "${PREFIX}/${RELPATH}"
+wget -nv -c -N -P "${PREFIX}/${RELPATH}" "${URL}"
+wget -nv -c -N -P "${PREFIX}/${RELPATH}" "${URL}.md5"
+
+date -Iseconds
