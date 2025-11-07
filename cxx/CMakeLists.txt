@@ -26,6 +26,13 @@ find_package(Boost COMPONENTS context)
 cmake_print_variables(Boost_FOUND Boost_INCLUDE_DIRS)
 
 include(FetchContent)
+FetchContent_Declare(fmt
+  GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+  GIT_TAG e69e5f977d458f2650bb346dadf2ad30c5320281
+  EXCLUDE_FROM_ALL
+  FIND_PACKAGE_ARGS 10.2.1
+)
+
 FetchContent_Declare(
   tomlplusplus
   GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
@@ -34,7 +41,7 @@ FetchContent_Declare(
   FIND_PACKAGE_ARGS 3.4.0
 )
 
-FetchContent_MakeAvailable(tomlplusplus)
+FetchContent_MakeAvailable(tomlplusplus fmt)
 find_package(Threads)
 find_package(wtl 0.10.2)
 find_package(sfmt)
@@ -56,6 +63,7 @@ endforeach()
 
 target_link_libraries(benchmark PRIVATE wtl::sfmt pcg::pcg pcglite::pcglite)
 target_link_libraries(concurrent PRIVATE Threads::Threads)
+target_link_libraries(format PRIVATE fmt::fmt)
 target_link_libraries(igraph PRIVATE igraph::igraph)
 target_link_libraries(toml PRIVATE tomlplusplus::tomlplusplus)
 if(Boost_FOUND)
