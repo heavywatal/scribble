@@ -7,17 +7,15 @@ include(CMakePrintHelpers)
 include(GNUInstallDirs)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-if (NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
-endif()
-cmake_print_variables(CMAKE_BUILD_TYPE)
-set(CMAKE_CXX_FLAGS_DEV "-O2 -g")
 set(CMAKE_CXX_EXTENSIONS OFF)
-
 add_library(common INTERFACE)
 target_compile_features(common INTERFACE cxx_std_17)
-target_compile_options(common INTERFACE
-  -Wall -Wextra -pedantic -Werror -march=native
+add_compile_options(
+  -Wall -Wextra -pedantic -Werror
+  $<IF:$<BOOL:$<CONFIG>>,,-O2>
+  $<IF:$<BOOL:$<CONFIG>>,,-g>
+  $<$<STREQUAL:${CMAKE_SYSTEM_PROCESSOR},x86_64>:-march=native>
+  $<$<STREQUAL:${CMAKE_SYSTEM_PROCESSOR},arm64>:-march=armv8.4-a>
 )
 target_link_libraries(common INTERFACE wtl::wtl)
 
@@ -31,14 +29,16 @@ include(FetchContent)
 FetchContent_Declare(
   tomlplusplus
   GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
-  GIT_TAG        v3.4.0
+  GIT_TAG 30172438cee64926dc41fdd9c11fb3ba5b2ba9de
+  EXCLUDE_FROM_ALL
+  FIND_PACKAGE_ARGS 3.4.0
 )
 
 FetchContent_MakeAvailable(tomlplusplus)
 find_package(Threads)
-find_package(wtl 0.10.0)
+find_package(wtl 0.10.2)
 find_package(sfmt)
-find_package(igraph 0.10.16)
+find_package(igraph 1.0.0)
 find_package(pcg)
 find_package(pcglite 0.2.1)
 
