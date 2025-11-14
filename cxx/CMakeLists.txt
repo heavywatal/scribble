@@ -17,7 +17,6 @@ add_compile_options(
   $<$<STREQUAL:${CMAKE_SYSTEM_PROCESSOR},x86_64>:-march=native>
   $<$<STREQUAL:${CMAKE_SYSTEM_PROCESSOR},arm64>:-march=armv8.4-a>
 )
-target_link_libraries(common INTERFACE wtl::wtl)
 
 set(CMAKE_MODULE_PATH "$ENV{HOME}/.cmake/packages")
 include(WarningFlagsCXX OPTIONAL)
@@ -55,6 +54,8 @@ if(Boost_FOUND)
   list(APPEND source_files ${boost_src})
 endif()
 
+target_link_libraries(common INTERFACE fmt::fmt wtl::wtl)
+
 foreach(src IN LISTS source_files)
   cmake_path(GET src STEM name_we)
   add_executable(${name_we} ${src})
@@ -63,7 +64,6 @@ endforeach()
 
 target_link_libraries(benchmark PRIVATE wtl::sfmt pcg::pcg pcglite::pcglite)
 target_link_libraries(concurrent PRIVATE Threads::Threads)
-target_link_libraries(format PRIVATE fmt::fmt)
 target_link_libraries(igraph PRIVATE igraph::igraph)
 target_link_libraries(toml PRIVATE tomlplusplus::tomlplusplus)
 if(Boost_FOUND)
