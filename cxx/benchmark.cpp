@@ -13,17 +13,17 @@ inline void random_uint32() {
     pcglite::pcg64 rng64{};
     constexpr size_t n = 4 * 1000 * 1000;
     uint32_t trash = 0;
-    std::cout << wtl::diff_rusage([&](){
+    std::cout << wtl::delta_rusage([&](){
         for (size_t i=0; i<n; ++i) {
             trash += static_cast<uint32_t>(rng64());
         }
     }, 3u) << "\t""static_cast32(gen64)""\t" << trash << std::endl;
-    std::cout << wtl::diff_rusage([&](){
+    std::cout << wtl::delta_rusage([&](){
         for (size_t i=0; i<n; ++i) {
             trash += rng32();
         }
     }, 3u) << "\t""gen32::operator()""\t" << trash << std::endl;
-    std::cout << wtl::diff_rusage([&](){
+    std::cout << wtl::delta_rusage([&](){
         std::uniform_int_distribution<uint32_t> unif;
         for (size_t i=0; i<n; ++i) {
             trash += unif(rng64);
@@ -36,22 +36,22 @@ inline void random_canonical() {
     pcglite::pcg64 rng64{};
     constexpr size_t n = 16 * 1000 * 1000;
     double trash = 0;
-    std::cout << wtl::diff_rusage([&](){
+    std::cout << wtl::delta_rusage([&](){
         for (size_t i=0; i<n; ++i) {
             trash += wtl::generate_canonical(rng64);
         }
     }, 5u) << "\t""wtl::generate_canonical(gen64)""\t" << trash << std::endl;
-    std::cout << wtl::diff_rusage([&](){
+    std::cout << wtl::delta_rusage([&](){
         for (size_t i=0; i<n; ++i) {
             trash += wtl::generate_canonical(rng32);
         }
     }, 5u) << "\t""wtl::generate_canonical(gen32)""\t" << trash << std::endl;
-    std::cout << wtl::diff_rusage([&](){
+    std::cout << wtl::delta_rusage([&](){
         for (size_t i=0; i<n; ++i) {
             trash += std::generate_canonical<double, std::numeric_limits<double>::digits>(rng64);
         }
     }, 5u) << "\t""std::generate_canonical<>(gen64)""\t" << trash << std::endl;
-    std::cout << wtl::diff_rusage([&](){
+    std::cout << wtl::delta_rusage([&](){
         for (size_t i=0; i<n; ++i) {
             trash += std::generate_canonical<double, std::numeric_limits<double>::digits>(rng32);
         }
@@ -65,19 +65,19 @@ inline void random_sample() {
     std::iota(x.begin(), x.end(), 0u);
     size_t k = n / 40u;
     size_t trash = 0;
-    std::cout << wtl::diff_rusage([&](){
+    std::cout << wtl::delta_rusage([&](){
         trash += *wtl::sample(n, k, rng64).begin();
     }, 3u) << "\t""sample int""\t" << trash << std::endl;;
-    std::cout << wtl::diff_rusage([&](){
+    std::cout << wtl::delta_rusage([&](){
         trash += wtl::sample(x, k, rng64)[0];
     }, 3u) << "\t""sample""\t" << trash << std::endl;;
-    std::cout << wtl::diff_rusage([&](){
+    std::cout << wtl::delta_rusage([&](){
         trash += wtl::sample_floyd(x, k, rng64)[0];
     }, 3u) << "\t""sample_floyd""\t" << trash << std::endl;;
-    std::cout << wtl::diff_rusage([&](){
+    std::cout << wtl::delta_rusage([&](){
         trash += wtl::sample_fisher(x, k, rng64)[0];
     }, 3u) << "\t""sample_fisher""\t" << trash << std::endl;;
-    std::cout << wtl::diff_rusage([&](){
+    std::cout << wtl::delta_rusage([&](){
         trash += wtl::sample_knuth(x, k, rng64)[0];
     }, 3u) << "\t""sample_knuth""\t" << trash << std::endl;;
     x.resize(6);
@@ -96,28 +96,28 @@ inline void random_engine() {
             v[j] = dist(generator);
         }
     };
-    std::cout << wtl::diff_rusage<std::micro>([&]() {
+    std::cout << wtl::delta_rusage<std::micro>([&]() {
       lambda_random(std::mt19937{});
     }, 3) << "\t""mt" << std::endl;
-    std::cout << wtl::diff_rusage<std::micro>([&]() {
+    std::cout << wtl::delta_rusage<std::micro>([&]() {
       lambda_random(std::mt19937_64{});
     }, 3) << "\t""mt64" << std::endl;
-    std::cout << wtl::diff_rusage<std::micro>([&]() {
+    std::cout << wtl::delta_rusage<std::micro>([&]() {
       lambda_random(wtl::sfmt19937{});
     }, 3) << "\t""sfmt" << std::endl;;
-    std::cout << wtl::diff_rusage<std::micro>([&]() {
+    std::cout << wtl::delta_rusage<std::micro>([&]() {
       lambda_random(wtl::sfmt19937_64{});
     }, 3) << "\t""sfmt64" << std::endl;
-    std::cout << wtl::diff_rusage<std::micro>([&]() {
+    std::cout << wtl::delta_rusage<std::micro>([&]() {
       lambda_random(pcglite::pcg32{});
     }, 3) << "\t""pcglite::pcg32" << std::endl;
-    std::cout << wtl::diff_rusage<std::micro>([&]() {
+    std::cout << wtl::delta_rusage<std::micro>([&]() {
       lambda_random(pcglite::pcg64{});
     }, 3) << "\t""pcglite::pcg64" << std::endl;
-    std::cout << wtl::diff_rusage<std::micro>([&]() {
+    std::cout << wtl::delta_rusage<std::micro>([&]() {
       lambda_random(pcg32{});
     }, 3) << "\t""pcg32" << std::endl;
-    std::cout << wtl::diff_rusage<std::micro>([&]() {
+    std::cout << wtl::delta_rusage<std::micro>([&]() {
       lambda_random(pcg64{});
     }, 3) << "\t""pcg64" << std::endl;
     std::cout << wtl::mean(v) << std::endl;
@@ -132,19 +132,19 @@ inline void random_binomial() {
     std::binomial_distribution binom05(10000, 0.5);
     std::binomial_distribution binom07(10000, 0.7);
     std::binomial_distribution binom09(10000, 0.95);
-    std::cout << wtl::diff_rusage([&](){
+    std::cout << wtl::delta_rusage([&](){
         for (size_t i=0; i<n; ++i) { trash += binom01(rng64); }
     }, 3u) << "\t""binom01" << std::endl;;
-    std::cout << wtl::diff_rusage([&](){
+    std::cout << wtl::delta_rusage([&](){
         for (size_t i=0; i<n; ++i) { trash += binom03(rng64); }
     }, 3u) << "\t""binom03" << std::endl;;
-    std::cout << wtl::diff_rusage([&](){
+    std::cout << wtl::delta_rusage([&](){
         for (size_t i=0; i<n; ++i) { trash += binom05(rng64); }
     }, 3u) << "\t""binom05" << std::endl;;
-    std::cout << wtl::diff_rusage([&](){
+    std::cout << wtl::delta_rusage([&](){
         for (size_t i=0; i<n; ++i) { trash += binom07(rng64); }
     }, 3u) << "\t""binom07" << std::endl;;
-    std::cout << wtl::diff_rusage([&](){
+    std::cout << wtl::delta_rusage([&](){
         for (size_t i=0; i<n; ++i) { trash += binom09(rng64); }
     }, 3u) << "\t""binom09" << std::endl;;
     std::cerr << trash << std::endl;

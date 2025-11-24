@@ -27,9 +27,9 @@ cmake_print_variables(Boost_FOUND Boost_INCLUDE_DIRS)
 include(FetchContent)
 FetchContent_Declare(fmt
   GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-  GIT_TAG e69e5f977d458f2650bb346dadf2ad30c5320281
+  GIT_TAG 407c905e45ad75fc29bf0f9bb7c5c2fd3475976f
   EXCLUDE_FROM_ALL
-  FIND_PACKAGE_ARGS 10.2.1
+  FIND_PACKAGE_ARGS 12.1.0
 )
 
 FetchContent_Declare(
@@ -42,11 +42,11 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(tomlplusplus fmt)
 find_package(Threads)
-find_package(wtl 0.10.2)
+find_package(wtl 0.11.2)
 find_package(sfmt)
 find_package(igraph 1.0.0)
 find_package(pcg)
-find_package(pcglite 0.2.1)
+find_package(pcglite 0.2.2)
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} source_files)
 if(Boost_FOUND)
