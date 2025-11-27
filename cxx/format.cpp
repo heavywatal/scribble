@@ -22,10 +22,27 @@ inline void floating_point_number() {
   }
 }
 
+inline void back_inserter() {
+  std::string buffer;
+  auto buffer_back = std::back_inserter(buffer);
+  for (int i=0; i<9; ++i) {
+    [[maybe_unused]]
+    auto back_unused = fmt::format_to(buffer_back, "{}-", i);
+  }
+  fmt::println("{}", buffer);
+}
+
+inline void memory_buffer() {
+  fmt::memory_buffer buffer;
+  fmt::format_to(std::back_inserter(buffer), "memory_buffer");
+  // fmt::println("{}", buffer); // not supported
+  fmt::println("{}", fmt::to_string(buffer)); // string constructor copies data
+  fmt::println("{}", std::string_view(buffer.data(), buffer.size()));
+}
+
 inline void date_time() {
   auto now_sec = std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now());
 #if __cplusplus >= 202002L
-  // C++20
   // auto now = {std::chrono::current_zone(), now_sec};
 #else
   auto now = now_sec;
@@ -62,6 +79,8 @@ inline void benchmark() {
 
 int main() {
   floating_point_number();
+  back_inserter();
+  memory_buffer();
   date_time();
   benchmark();
   return 0;
