@@ -11,7 +11,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_library(common INTERFACE)
 target_compile_features(common INTERFACE cxx_std_17)
 add_compile_options(
-  -Wall -Wextra -pedantic -Werror
+  -Wall -Wextra -Wpedantic
+  -Wconversion -Wsign-conversion -Wshadow
+  $<IF:$<BOOL:$<CONFIG>>,,-Werror>
   $<IF:$<BOOL:$<CONFIG>>,,-O2>
   $<IF:$<BOOL:$<CONFIG>>,,-g>
   $<$<STREQUAL:${CMAKE_SYSTEM_PROCESSOR},x86_64>:-march=native>
@@ -41,8 +43,7 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(tomlplusplus fmt)
-find_package(Threads)
-find_package(wtl 0.11.2)
+find_package(wtl 0.11.2 COMPONENTS threads)
 find_package(sfmt)
 find_package(igraph 1.0.0)
 find_package(pcg)
@@ -63,14 +64,17 @@ foreach(src IN LISTS source_files)
 endforeach()
 
 target_link_libraries(benchmark PRIVATE wtl::sfmt pcg::pcg pcglite::pcglite)
-target_link_libraries(concurrent PRIVATE Threads::Threads)
+target_link_libraries(concurrent PRIVATE wtl::threads)
 target_link_libraries(igraph PRIVATE igraph::igraph)
 target_link_libraries(toml PRIVATE tomlplusplus::tomlplusplus)
 if(Boost_FOUND)
   target_link_libraries(boost_coroutine2 PRIVATE Boost::context)
   target_link_libraries(boost_graph PRIVATE Boost::boost)
   target_link_libraries(boost_math PRIVATE Boost::boost)
+  target_compile_options(boost_graph PRIVATE -Wno-sign-conversion)
 endif()
+target_compile_options(bitwise PRIVATE -Wno-sign-conversion)
+target_compile_options(union PRIVATE -Wno-sign-conversion)
 
 cmake_print_variables(CMAKE_CXX_FLAGS_DEBUG)
 cmake_print_variables(CMAKE_CXX_FLAGS_RELWITHDEBINFO)
