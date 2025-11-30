@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include <fmt/format.h>
+#include <fmt/ranges.h>
 #include <fmt/chrono.h>
 
 #include <wtl/iostr.hpp>
@@ -53,28 +54,34 @@ inline void date_time() {
 }
 
 inline void benchmark() {
-  int n = 65535;
-  std::cout << wtl::delta_rusage([&](){
-    std::ostringstream oss;
-    for (int i=0; i<n; ++i) {
-      oss << "The answer is " << i << "\n";
-    }
-    std::cout << oss.str().size() << std::endl;
-  }, 3u) << "\t""std::ostringstream""\t" << std::endl;
-  std::cout << wtl::delta_rusage([&](){
-    std::string buffer;
-    for (int i=0; i<n; ++i) {
-      fmt::format_to(std::back_inserter(buffer), "The answer is {}\n", i);
-    }
-    std::cout << buffer.size() << std::endl;
-  }, 3u) << "\t""fmt::format_to(std::string)""\t" << std::endl;
-  std::cout << wtl::delta_rusage([&](){
-    fmt::memory_buffer buffer;
-    for (int i=0; i<n; ++i) {
-      fmt::format_to(std::back_inserter(buffer), "The answer is {}\n", i);
-    }
-    std::cout << buffer.size() << std::endl;
-  }, 3u) << "\t""fmt::format_to(fmt::memory_buffer)""\t" << std::endl;
+  constexpr int n = 65535;
+  {
+    const auto ru = wtl::delta_rusage([&](){
+      std::ostringstream oss;
+      for (int i=0; i<n; ++i) {
+        oss << "The answer is " << i << "\n";
+      }
+    }, 3);
+    fmt::println("{}\tstd::ostringstream\t", fmt::join(ru, "\t"));
+  }
+  {
+    const auto ru = wtl::delta_rusage([&](){
+      std::string buffer;
+      for (int i=0; i<n; ++i) {
+        fmt::format_to(std::back_inserter(buffer), "The answer is {}\n", i);
+      }
+    }, 3);
+    fmt::println("{}\tfmt::format_to(std::string)\t", fmt::join(ru, "\t"));
+  }
+  {
+    const auto ru = wtl::delta_rusage([&](){
+      fmt::memory_buffer buffer;
+      for (int i=0; i<n; ++i) {
+        fmt::format_to(std::back_inserter(buffer), "The answer is {}\n", i);
+      }
+    }, 3);
+    fmt::println("{}\tfmt::format_to(fmt::memory_buffer)\t", fmt::join(ru, "\t"));
+  }
 }
 
 int main() {
