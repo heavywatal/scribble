@@ -1,12 +1,13 @@
 #include <wtl/concurrent.hpp>
 
-#include <iostream>
-#include <sstream>
+#include <fmt/base.h>
+#include <fmt/std.h>
+
+#include <cstdio>
 
 int main() {
     const unsigned int concurrency = std::thread::hardware_concurrency();
-    std::cerr << "std::thread::hardware_concurrency(): "
-              << concurrency << std::endl;
+    fmt::println(stderr, "std::thread::hardware_concurrency(): {}", concurrency);
 
     std::vector<std::future<int>> futures;
     wtl::Semaphore semaphore(2);
@@ -17,34 +18,30 @@ int main() {
         semaphore.lock();
         futures.push_back(std::async(std::launch::async, [&semaphore, i] {
             std::lock_guard<wtl::Semaphore> scope_unlock(semaphore, std::adopt_lock);
-            std::ostringstream oss;
-            oss << std::this_thread::get_id() << ": " << i << "\n";
-            std::cerr << oss.str() << std::flush;
+            fmt::println(stderr, "{}: {}", std::this_thread::get_id(), i);
             std::this_thread::sleep_for(std::chrono::milliseconds(300));
             return i;
         }));
     }
     for (auto& x: futures) x.wait();
     for (auto& x: futures) {
-        std::cerr << x.get() << " ";
+        fmt::print(stderr, "{} ", x.get());
     }
-    std::cerr << std::endl;
+    fmt::print(stderr, "\n");
 
     futures.clear();
     for (int i = 0; i < n; ++i) {
         // RAII lock after thread creation: new thread IDs are created
         futures.push_back(std::async(std::launch::async, [&semaphore, i] {
             std::lock_guard<wtl::Semaphore> _(semaphore);
-            std::ostringstream oss;
-            oss << std::this_thread::get_id() << ": " << i << "\n";
-            std::cerr << oss.str() << std::flush;
+            fmt::println(stderr, "{}: {}", std::this_thread::get_id(), i);
             std::this_thread::sleep_for(std::chrono::milliseconds(300));
             return i;
         }));
     }
     for (auto& x: futures) x.wait();
     for (auto& x: futures) {
-        std::cerr << x.get() << " ";
+        fmt::print(stderr, "{} ", x.get());
     }
-    std::cerr << std::endl;
+    fmt::print(stderr, "\n");
 }

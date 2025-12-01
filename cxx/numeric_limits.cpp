@@ -1,34 +1,35 @@
-#include <cstdint>
+#include <fmt/base.h>
+
+#include <cstddef>
 #include <cmath>
 #include <limits>
-#include <iostream>
 
 template <class T> inline
 void common() {
-    std::cout << "max() " << std::numeric_limits<T>::max() << "\n";
-    std::cout << "min() " << std::numeric_limits<T>::min() << "\n";
-    std::cout << "lowest() " << std::numeric_limits<T>::lowest() << "\n";
-    std::cout << "digits " << std::numeric_limits<T>::digits << "\n";
-    std::cout << "digits10 " << std::numeric_limits<T>::digits10 << "\n";
-    std::cout << "log10(max()) " << std::log10(std::numeric_limits<T>::max()) << "\n";
+    fmt::println("max() {}", std::numeric_limits<T>::max());
+    fmt::println("min() {}", std::numeric_limits<T>::min());
+    fmt::println("lowest() {}", std::numeric_limits<T>::lowest());
+    fmt::println("digits {}", std::numeric_limits<T>::digits);
+    fmt::println("digits10 {}", std::numeric_limits<T>::digits10);
+    fmt::println("log10(max()) {}", std::log10(std::numeric_limits<T>::max()));
 }
 
 template <class T> inline
 void floating() {
-    std::cout << "max_digits10 " << std::numeric_limits<T>::max_digits10 << "\n";
-    std::cout << "epsilon() " << std::numeric_limits<T>::epsilon() << "\n";
-    std::cout << "max_exponent " << std::numeric_limits<T>::max_exponent << "\n";
-    std::cout << "max_exponent10 " << std::numeric_limits<T>::max_exponent10 << "\n";
-    std::cout << "min_exponent " << std::numeric_limits<T>::min_exponent << "\n";
-    std::cout << "min_exponent10 " << std::numeric_limits<T>::min_exponent10 << "\n";
+    fmt::println("max_digits10 {}", std::numeric_limits<T>::max_digits10);
+    fmt::println("epsilon() {}", std::numeric_limits<T>::epsilon());
+    fmt::println("max_exponent {}", std::numeric_limits<T>::max_exponent);
+    fmt::println("max_exponent10 {}", std::numeric_limits<T>::max_exponent10);
+    fmt::println("min_exponent {}", std::numeric_limits<T>::min_exponent);
+    fmt::println("min_exponent10 {}", std::numeric_limits<T>::min_exponent10);
 }
 
 int main() {
-    std::cout << "std::numeric_limits<int> ----------------\n";
+    fmt::println("std::numeric_limits<int> ----------------");
     common<int>();
-    std::cout << "std::numeric_limits<size_t> ----------------\n";
+    fmt::println("std::numeric_limits<size_t> ----------------");
     common<size_t>();
-    std::cout << "std::numeric_limits<double> ----------------\n";
+    fmt::println("std::numeric_limits<double> ----------------");
     common<double>();
     floating<double>();
     return 0;

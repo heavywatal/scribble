@@ -1,51 +1,54 @@
 // echo | clang++ -E -dM -
 // echo | g++ -E -dM -
 
-#include <iostream>
+#include <fmt/base.h>
 
 int main() {
-    std::cout << "\n__TIMESTAMP__  " << __TIMESTAMP__;
-    std::cout << "\n__DATE__       " << __DATE__;
-    std::cout << "\n__TIME__       " << __TIME__;
-    std::cout << "\n__FILE__       " << __FILE__;
-    std::cout << "\n__LINE__       " << __LINE__;
-    std::cout << "\n__func__       " << __func__;
-    std::cout << "\n__cplusplus    " << __cplusplus;
+    fmt::println("__TIMESTAMP__  {}", __TIMESTAMP__);
+    fmt::println("__DATE__       {}", __DATE__);
+    fmt::println("__TIME__       {}", __TIME__);
+    fmt::println("__FILE__       {}", __FILE__);
+    fmt::println("__LINE__       {}", __LINE__);
+    fmt::println("__func__       {}", __func__);
+    fmt::println("__cplusplus    {}", __cplusplus);
+
+#ifdef __STDCPP_THREADS__
+    fmt::println("__STDCPP_THREADS__ {}", __STDCPP_THREADS__);
+#endif
 
 #ifdef __LP64__
-    std::cout << "\n__LP64__";
+    fmt::println("__LP64__");
 #elif defined __LLP64__
-    std::cout << "\n__LLP64__";
+    fmt::println("__LLP64__");
 #elif defined __ILP64__
-    std::cout << "\n__ILP64__";
+    fmt::println("__ILP64__");
 #endif
 
 #ifdef __unix__
-    std::cout << "\n__unix__";
+    fmt::println("__unix__");
 #endif
 #ifdef __linux__
-    std::cout << "\n__linux__";
+    fmt::println("__linux__");
 #endif
 #ifdef __APPLE__
-    std::cout << "\n__APPLE__";
+    fmt::println("__APPLE__");
 #endif
 #ifdef _WIN32
-    std::cout << "\n_WIN32";
+    fmt::println("_WIN32");
 #endif
 #ifdef _WIN64
-    std::cout << "\n_WIN64";
+    fmt::println("_WIN64");
 #endif
 
 #ifdef __SSE__
-    std::cout << "\n__SSE__";
+    fmt::println("__SSE__");
 #endif
 #ifdef __SSE2__
-    std::cout << "\n__SSE2__";
+    fmt::println("__SSE2__");
 #endif
 #ifdef __SSE3__
-    std::cout << "\n__SSE3__";
+    fmt::println("__SSE3__");
 #endif
 
-    std::cout << "\n";
     return 0;
 }
