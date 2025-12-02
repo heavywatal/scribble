@@ -25,12 +25,21 @@ void floating() {
 }
 
 int main() {
-    fmt::println("std::numeric_limits<int> ----------------");
+    fmt::println("## std::numeric_limits<int>");
     common<int>();
-    fmt::println("std::numeric_limits<size_t> ----------------");
+    fmt::println("## std::numeric_limits<unsigned>");
+    common<unsigned>();
+    fmt::println("## std::numeric_limits<ptrdiff_t>");
+    common<ptrdiff_t>();
+    fmt::println("## std::numeric_limits<size_t>");
     common<size_t>();
-    fmt::println("std::numeric_limits<double> ----------------");
+    fmt::println("## std::numeric_limits<double>");
     common<double>();
     floating<double>();
+    if constexpr (sizeof(long double) > sizeof(double)) {
+        fmt::println("## std::numeric_limits<long double>");
+        common<long double>();
+        floating<long double>();
+    }
     return 0;
 }
