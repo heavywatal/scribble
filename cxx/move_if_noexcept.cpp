@@ -1,4 +1,5 @@
-#include <iostream>
+#include <fmt/base.h>
+
 #include <vector>
 #include <type_traits>
 #include <typeinfo>
@@ -6,11 +7,11 @@
 class MoveImplicit {
   public:
     MoveImplicit() {
-        std::cout << "ctor\n";
+        fmt::println("ctor");
     }
     ~MoveImplicit() = default;
     MoveImplicit(const MoveImplicit&) {
-        std::cout << "copied!\n";
+        fmt::println("copied!");
     }
     // copied by implicit move ctor;
 };
@@ -18,14 +19,14 @@ class MoveImplicit {
 class MoveNaive {
   public:
     MoveNaive() {
-        std::cout << "ctor\n";
+        fmt::println("ctor");
     }
     ~MoveNaive() = default;
     MoveNaive(const MoveNaive&) {
-        std::cout << "copied!\n";
+        fmt::println("copied!");
     }
     MoveNaive(MoveNaive&&) {
-        std::cout << "moved\n";
+        fmt::println("moved");
     }
     // copied by std::move_if_noexcept(), e.g., in std::vector reallocation
 };
@@ -33,14 +34,14 @@ class MoveNaive {
 class MoveNoExcept {
   public:
     MoveNoExcept() noexcept {
-        std::cout << "ctor\n";
+        fmt::println("ctor");
     }
     ~MoveNoExcept() noexcept = default;
     MoveNoExcept(const MoveNoExcept&) noexcept {
-        std::cout << "copied!\n";
+        fmt::println("copied!");
     }
     MoveNoExcept(MoveNoExcept&&) noexcept {
-        std::cout << "moved\n";
+        fmt::println("moved");
     }
 };
 
@@ -50,10 +51,13 @@ static_assert( std::is_nothrow_move_constructible<MoveNoExcept>{}, "");
 
 template <class T>
 void test() {
-    std::cout << "######## " << typeid(T).name() << " ########\n";
+    fmt::println("## {}", typeid(T).name());
     std::vector<T> v;
+    fmt::println("### push_back");
     v.push_back(T{});
+    fmt::println("### emplace_back");
     v.emplace_back();
+    fmt::println("### resize");
     v.resize(3u);
 }
 

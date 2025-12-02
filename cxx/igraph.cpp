@@ -1,5 +1,6 @@
+#include <fmt/base.h>
+
 #include <igraph/igraph.h>
-#include <iostream>
 
 int main() {
   igraph_t graph;
@@ -12,6 +13,6 @@ int main() {
 
   igraph_real_t res;
   igraph_average_path_length(&graph, nullptr, &res, nullptr, true, true);
-  std::cout << res << std::endl;
+  fmt::println("average_path_length: {}", res);
   return 0;
 }

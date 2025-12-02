@@ -1,3 +1,5 @@
+#include <fmt/base.h>
+
 #include <unistd.h> // chdir, getcwd, unlink, access, getpid, gethostname
 #include <dirent.h> // opendir
 #include <sys/stat.h> // mkdir, stat
@@ -10,7 +12,6 @@
 #include <string>
 #include <fstream>
 #include <vector>
-#include <iostream>
 
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////
 namespace wtl {
@@ -149,20 +150,19 @@ inline unsigned int dev_urandom() {
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////
 
 int main() {
-    std::cout << wtl::dev_urandom() << "\n";
-    std::cout << wtl::gethostname() << "\n";
-    std::cout << wtl::getenv("HOME") << "\n";
-    std::cout << wtl::pwd() << "\n";
-    std::cout << wtl::dirname(wtl::pwd()) << "\n";
-    std::cout << wtl::basename(wtl::pwd()) << "\n";
+    fmt::println("dev_urandom(): {}", wtl::dev_urandom());
+    fmt::println("gethostname(): {}", wtl::gethostname());
+    fmt::println("getenv(HOME): {}", wtl::getenv("HOME"));
+    fmt::println("pwd(): {}", wtl::pwd());
+    fmt::println("dirname(pwd()): {}", wtl::dirname(wtl::pwd()));
+    fmt::println("basename(pwd()): {}", wtl::basename(wtl::pwd()));
     for (const auto& x: wtl::ls()) {
-        std::cout << x;
         if (wtl::isdir(x)) {
-            std::cout << "/ ";
+            fmt::print("{}/ ", x);
         } else {
-            std::cout << " ";
+            fmt::print("{} ", x);
         }
     }
-    std::cout << "\n";
+    fmt::print("\n");
     return 0;
 }

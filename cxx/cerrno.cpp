@@ -1,8 +1,9 @@
+#include <fmt/base.h>
+
 #include <cerrno>
 #include <cstring>
 #include <cstdio>
 #include <string>
-#include <iostream>
 #include <fstream>
 
 namespace wtl {
@@ -21,8 +22,8 @@ int main() {
     std::string filename("noexist.txt");
     std::ifstream ifs(filename);
     if (ifs.fail() || ifs.bad()) {
-        std::cout << filename << ": " << std::strerror(errno) << std::endl;
-        std::cout << wtl::strerror(filename) << std::endl;
+        fmt::println("{}: {}", filename, std::strerror(errno));
+        fmt::println("{}", wtl::strerror(filename));
         std::perror(filename.c_str());
     }
     return 0;

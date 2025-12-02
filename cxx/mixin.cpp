@@ -1,6 +1,7 @@
+#include <fmt/base.h>
+
 #include <mutex>
 #include <memory>
-#include <iostream>
 
 template <class T>
 class Singleton {
@@ -48,7 +49,7 @@ class Cls : public Singleton<Cls> {
 };
 
 int main() {
-    std::cout << Cls::instance(24601).whoami << "\n";
-    std::cout << Cls::instance(42).whoami << "\n";
+    fmt::println("{}", Cls::instance(24601).whoami);
+    fmt::println("{}", Cls::instance(42).whoami);
     return 0;
 }

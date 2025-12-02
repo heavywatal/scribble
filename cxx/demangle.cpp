@@ -1,6 +1,7 @@
+#include <fmt/base.h>
+
 #include <cxxabi.h>
 #include <string>
-#include <iostream>
 
 inline std::string demangle(const char * type_info_name) {
     int status(0);
@@ -16,7 +17,7 @@ int main() {
     int i = 0;
     unsigned int u = 0;
     double d = 0.0;
-    std::cout << typestr(i) << std::endl;
-    std::cout << typestr(u) << std::endl;
-    std::cout << typestr(d) << std::endl;
+    fmt::println("{}", typestr(i));
+    fmt::println("{}", typestr(u));
+    fmt::println("{}", typestr(d));
 }
