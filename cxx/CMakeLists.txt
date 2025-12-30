@@ -33,6 +33,10 @@ FetchContent_Declare(fmt
   EXCLUDE_FROM_ALL
   FIND_PACKAGE_ARGS 12.1.0
 )
+add_compile_definitions(
+  # FMT_USE_LOCALE=0
+  FMT_OPTIMIZE_SIZE=1
+)
 
 FetchContent_Declare(
   tomlplusplus
