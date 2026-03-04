@@ -40,17 +40,30 @@ add_compile_definitions(
 
 FetchContent_Declare(
   tomlplusplus
-  GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
-  GIT_TAG 30172438cee64926dc41fdd9c11fb3ba5b2ba9de
+  URL https://github.com/marzer/tomlplusplus/archive/refs/tags/v3.4.0.tar.gz
+  URL_HASH SHA256=8517f65938a4faae9ccf8ebb36631a38c1cadfb5efa85d9a72e15b9e97d25155
+  DOWNLOAD_NO_PROGRESS TRUE
   EXCLUDE_FROM_ALL
   FIND_PACKAGE_ARGS 3.4.0
 )
 
-FetchContent_MakeAvailable(tomlplusplus fmt)
+FetchContent_Declare(
+  pcg_cpp
+  URL https://github.com/imneme/pcg-cpp/archive/refs/heads/master.tar.gz
+  URL_HASH SHA256=88fb53e10566426e66e1b3967746c23e46395d4e6cfd57303ebab1ed2bb15cc9
+  DOWNLOAD_NO_PROGRESS TRUE
+  EXCLUDE_FROM_ALL
+)
+
+FetchContent_MakeAvailable(tomlplusplus fmt pcg_cpp)
+
+add_library(pcg INTERFACE EXCLUDE_FROM_ALL)
+add_library(pcg::pcg ALIAS pcg)
+target_include_directories(pcg INTERFACE "${pcg_cpp_SOURCE_DIR}/include")
+
 find_package(wtl 0.11.2 COMPONENTS threads)
 find_package(sfmt)
 find_package(igraph 1.0.0)
-find_package(pcg)
 find_package(pcglite 0.2.2)
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} source_files)

@@ -7,7 +7,7 @@
 #include <wtl/iostr.hpp>
 #include <wtl/signed.hpp>
 #include <pcglite/pcglite.hpp>
-#include <pcg/pcg_random.hpp>
+#include <pcg_random.hpp>
 
 #include <sfmt.hpp>
 
