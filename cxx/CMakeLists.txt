@@ -49,8 +49,8 @@ FetchContent_Declare(
 
 FetchContent_Declare(
   pcg_cpp
-  URL https://github.com/imneme/pcg-cpp/archive/refs/heads/master.tar.gz
-  URL_HASH SHA256=88fb53e10566426e66e1b3967746c23e46395d4e6cfd57303ebab1ed2bb15cc9
+  URL https://github.com/imneme/pcg-cpp/archive/428802d1a5634f96bcd0705fab379ff0113bcf13.tar.gz
+  URL_HASH SHA256=79f23706ed0cbc1bb57ea35d50d0abed66898b8f7b0bcf2aaecdfd234863b060
   DOWNLOAD_NO_PROGRESS TRUE
   EXCLUDE_FROM_ALL
 )
