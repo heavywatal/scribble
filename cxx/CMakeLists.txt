@@ -9,7 +9,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(CMAKE_CXX_EXTENSIONS OFF)
 add_library(common INTERFACE)
-target_compile_features(common INTERFACE cxx_std_17)
+target_compile_features(common INTERFACE cxx_std_20)
 add_compile_options(
   -Wall -Wextra -Wpedantic
   -Wconversion -Wsign-conversion -Wshadow
@@ -61,7 +61,7 @@ add_library(pcg INTERFACE EXCLUDE_FROM_ALL)
 add_library(pcg::pcg ALIAS pcg)
 target_include_directories(pcg INTERFACE "${pcg_cpp_SOURCE_DIR}/include")
 
-find_package(wtl 0.11.2 COMPONENTS threads)
+find_package(wtl 0.11.3 COMPONENTS threads)
 find_package(sfmt)
 find_package(igraph 1.0.0)
 find_package(pcglite 0.2.2)

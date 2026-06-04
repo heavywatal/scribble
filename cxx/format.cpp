@@ -1,4 +1,5 @@
 #include <chrono>
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <iterator>
@@ -45,11 +46,11 @@ inline void memory_buffer() {
 
 inline void date_time() {
   auto now_sec = std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now());
-#if __cplusplus >= 202002L
-  // auto now = {std::chrono::current_zone(), now_sec};
-#else
+// #if __cplusplus >= 202002L
+//   auto now = {std::chrono::current_zone(), now_sec};
+// #else
   auto now = now_sec;
-#endif
+// #endif
   fmt::println("{:%Y%m%d_%H%M%S}", now);
   std::string str_format("{:%FT%T%z}");
   fmt::println(fmt::runtime(str_format), now);
@@ -109,6 +110,20 @@ inline void benchmark() {
       oss << "The answer is " << i << "\n";
     }
   }, 3));
+  fmt::println("{}\tstd::format_to(std::string)", wtl::delta_rusage([&](){
+    std::string buffer;
+    auto out = std::back_inserter(buffer);
+    for (int i = 0; i < n; ++i) {
+      std::format_to(out, "The answer is {}\n", i);
+    }
+  }, 3));
+  fmt::println("{}\tstd::format_to(fmt::memory_buffer)", wtl::delta_rusage([&](){
+    fmt::memory_buffer buffer;
+    auto out = std::back_inserter(buffer);
+    for (int i = 0; i < n; ++i) {
+      std::format_to(out, "The answer is {}\n", i);
+    }
+  }, 3));
   fmt::println("{}\tfmt::format_to(std::string)", wtl::delta_rusage([&](){
     std::string buffer;
     auto out = std::back_inserter(buffer);
@@ -133,7 +148,7 @@ inline void benchmark() {
   }, 3));
   fmt::println("trash: {}", trash);
 
-  fmt::println("{}\tfmt::format_to(\t\t\t\t)", wtl::delta_rusage([&](){
+  fmt::println("{}\tfmt::format_to(\\t\\t\\t\\t)", wtl::delta_rusage([&](){
     fmt::memory_buffer buffer;
     auto out = std::back_inserter(buffer);
     for (int i = 0; i < n; ++i) {
@@ -143,7 +158,7 @@ inline void benchmark() {
       fmt::format_to(out, "{}\t{}\t{}\t{}\n", i, d, fmt::ptr(pi), fmt::ptr(pd));
     }
   }, 3));
-  fmt::println("{}\tfmt::format_to(fmt::join(t, \t))", wtl::delta_rusage([&](){
+  fmt::println("{}\tfmt::format_to(fmt::join(t, \\t))", wtl::delta_rusage([&](){
     fmt::memory_buffer buffer;
     auto out = std::back_inserter(buffer);
     for (int i = 0; i < n; ++i) {
