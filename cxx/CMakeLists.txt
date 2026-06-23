@@ -34,6 +34,7 @@ FetchContent_Declare(fmt
   FIND_PACKAGE_ARGS 12.1.0
 )
 add_compile_definitions(
+  _LIBCPP_REMOVE_TRANSITIVE_INCLUDES=1
   # FMT_USE_LOCALE=0
   FMT_OPTIMIZE_SIZE=1
 )

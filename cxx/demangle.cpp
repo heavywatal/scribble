@@ -1,6 +1,7 @@
 #include <fmt/base.h>
 
 #include <cxxabi.h>
+#include <typeinfo>
 #include <string>
 
 inline std::string demangle(const char * type_info_name) {
