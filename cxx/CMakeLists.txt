@@ -28,10 +28,10 @@ cmake_print_variables(Boost_FOUND Boost_INCLUDE_DIRS)
 
 include(FetchContent)
 FetchContent_Declare(fmt
-  GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-  GIT_TAG 407c905e45ad75fc29bf0f9bb7c5c2fd3475976f
+  URL https://github.com/fmtlib/fmt/archive/refs/tags/12.2.0.tar.gz
+  URL_HASH SHA256=8b852bb5aa6e7d8564f9e81394055395dd1d1936d38dfd3a17792a02bebd7af0
   EXCLUDE_FROM_ALL
-  FIND_PACKAGE_ARGS 12.1.0
+  FIND_PACKAGE_ARGS 12.2.0
 )
 add_compile_definitions(
   _LIBCPP_REMOVE_TRANSITIVE_INCLUDES=1
