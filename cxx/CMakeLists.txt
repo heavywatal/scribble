@@ -20,9 +20,6 @@ add_compile_options(
   $<$<STREQUAL:${CMAKE_SYSTEM_PROCESSOR},arm64>:-march=armv8.4-a>
 )
 
-set(CMAKE_MODULE_PATH "$ENV{HOME}/.cmake/packages")
-include(WarningFlagsCXX OPTIONAL)
-
 find_package(Boost COMPONENTS context)
 cmake_print_variables(Boost_FOUND Boost_INCLUDE_DIRS)
 
@@ -57,6 +54,10 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(tomlplusplus fmt pcg_cpp)
+
+set(CMAKE_MODULE_PATH "$ENV{HOME}/.cmake/packages")
+include(WarningFlagsCXX OPTIONAL)
+target_compile_options(fmt INTERFACE -Wno-float-equal)
 
 add_library(pcg INTERFACE EXCLUDE_FROM_ALL)
 add_library(pcg::pcg ALIAS pcg)
