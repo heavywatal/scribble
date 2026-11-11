@@ -19,8 +19,8 @@ if (FALSE) {
 }
 
 family = "SF Pro Display Semibold"
-
-p = tibble(text = "ASPO", x = 0, y = 0) |>
+text = "ASPO"
+p = tibble(text = text, x = 0, y = 0) |>
   ggplot() +
   aes(x, y) +
   geom_text(aes(label = text), size = 64, color = "#3E1485") +
@@ -31,7 +31,7 @@ ggsave("aspo-logo.png", p, width = 7, height = 7, device = ragg::agg_png) |>
   wtl::oxipng()
 
 p = tibble(
-  text = c("A", "S", "P", "O"),
+  text = stringr::str_split_1(text, ""),
   x = 0.45 * c(-1, 1, -1, 1),
   y = 0.50 * c(1, 1, -1, -1)
 ) |>
@@ -42,6 +42,22 @@ p = tibble(
   theme_void(base_family = family)
 p
 ggsave("aspo-square.png", p, width = 7, height = 7, device = ragg::agg_png) |>
+  wtl::oxipng()
+
+family = "Hiragino Sans W4"
+text = "運営機構"
+p = tibble(
+  text = stringr::str_split_1(text, ""),
+  x = 0.45 * c(-1, 1, -1, 1),
+  y = 0.50 * c(1, 1, -1, -1)
+) |>
+  ggplot() +
+  aes(x, y) +
+  geom_text(aes(label = text), size = 72, color = "#3E1485") +
+  coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1)) +
+  theme_void(base_family = family)
+p
+ggsave("unneikiko-square.png", p, width = 7, height = 7, device = ragg::agg_png) |>
   wtl::oxipng()
 
 family = "SF Pro Condensed Semibold"
