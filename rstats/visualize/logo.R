@@ -60,6 +60,22 @@ p
 ggsave("unneikiko-square.png", p, width = 7, height = 7, device = ragg::agg_png) |>
   wtl::oxipng()
 
+family = "Hiragino Sans W5"
+text = "生物学科"
+p = tibble(
+  text = stringr::str_split_1(text, ""),
+  x = 0.45 * c(-1, 1, -1, 1),
+  y = 0.50 * c(1, 1, -1, -1)
+) |>
+  ggplot() +
+  aes(x, y) +
+  geom_text(aes(label = text), size = 72, color = "#369092") +
+  coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1)) +
+  theme_void(base_family = family, paper = "#f9f8f6")
+p
+ggsave("rinama.png", p, width = 7, height = 7, device = ragg::agg_png) |>
+  wtl::oxipng()
+
 family = "SF Pro Condensed Semibold"
 
 dev.off()
