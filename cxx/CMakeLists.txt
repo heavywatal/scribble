@@ -45,6 +45,27 @@ FetchContent_Declare(
   FIND_PACKAGE_ARGS 3.4.0
 )
 
+FetchContent_Declare(igraph
+  URL https://github.com/igraph/igraph/releases/download/1.0.1/igraph-1.0.1.tar.gz
+  URL_HASH SHA256=969f2d7d22f67e788d8638c9a8c96615f50d7819c08978b3ef4a787bb6daa96c
+  EXCLUDE_FROM_ALL
+  FIND_PACKAGE_ARGS 1.0.1
+)
+
+FetchContent_Declare(wtl
+  URL https://github.com/heavywatal/cxxwtl/archive/refs/tags/v0.11.4.tar.gz
+  URL_HASH SHA256=aef2f50a9bd47d18d5a5e782026430611c8cb2b0f37dff6f553b4edaa9cd3f09
+  EXCLUDE_FROM_ALL
+  FIND_PACKAGE_ARGS 0.11.4 COMPONENTS threads zlib
+)
+
+FetchContent_Declare(pcglite
+  URL https://github.com/heavywatal/pcglite/archive/refs/tags/v0.2.2.tar.gz
+  URL_HASH SHA256=f082db23389a653630a9596704bdea9e587486a2cb3a100e106529a4de7b0193
+  EXCLUDE_FROM_ALL
+  FIND_PACKAGE_ARGS 0.2.2
+)
+
 FetchContent_Declare(
   pcg_cpp
   URL https://github.com/imneme/pcg-cpp/archive/428802d1a5634f96bcd0705fab379ff0113bcf13.tar.gz
@@ -53,7 +74,14 @@ FetchContent_Declare(
   EXCLUDE_FROM_ALL
 )
 
-FetchContent_MakeAvailable(tomlplusplus fmt pcg_cpp)
+FetchContent_Declare(sfmt
+  URL https://github.com/heavywatal/sfmt-class/archive/refs/tags/v0.7.6.tar.gz
+  URL_HASH SHA256=fd4a17a88711a2b5283529d38aadfe16c81830c8aa66652334923137adaf6d17
+  EXCLUDE_FROM_ALL
+  FIND_PACKAGE_ARGS 0.7.6
+)
+
+FetchContent_MakeAvailable(tomlplusplus fmt igraph wtl pcglite pcg_cpp sfmt)
 
 set(CMAKE_MODULE_PATH "$ENV{HOME}/.cmake/packages")
 include(WarningFlagsCXX OPTIONAL)
@@ -62,11 +90,6 @@ target_compile_options(fmt INTERFACE -Wno-float-equal)
 add_library(pcg INTERFACE EXCLUDE_FROM_ALL)
 add_library(pcg::pcg ALIAS pcg)
 target_include_directories(pcg INTERFACE "${pcg_cpp_SOURCE_DIR}/include")
-
-find_package(wtl 0.11.3 COMPONENTS threads)
-find_package(sfmt)
-find_package(igraph 1.0.0)
-find_package(pcglite 0.2.2)
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} source_files)
 if(Boost_FOUND)
